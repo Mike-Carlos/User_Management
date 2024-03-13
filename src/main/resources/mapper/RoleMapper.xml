@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.controlcenter.controlcenter.dao.RoleDao">
+
+<!-- Fetch Data -->
+    <select id="getAllRole" resultType="com.controlcenter.controlcenter.model.RoleOutput">
+        SELECT role_id, title, role_sh_name, role_user_level, del_flag
+          FROM tbl_role_mst
+         WHERE del_flag = 0
+      ORDER BY role_id DESC, reg_date DESC;
+    </select>
+
+    <select id="getRoleById" resultType="com.controlcenter.controlcenter.model.RoleOutput">
+        SELECT role_id, title, role_sh_name, role_user_level, del_flag
+          FROM tbl_role_mst
+         WHERE role_id = #{id};
+    </select>
+
+<!-- Add Data -->
+    <insert id="addRole" parameterType="com.controlcenter.controlcenter.model.RoleInput">
+        INSERT INTO tbl_role_mst (
+            title, 
+            role_sh_name, 
+            role_user_level, 
+            reg_id
+        )
+        VALUES (
+            #{title}, 
+            #{role_sh_name}, 
+            #{role_user_level}, 
+            1
+        );
+    </insert>
+
+<!-- Update Data -->
+    <update id="editRoleInfo" parameterType="map">
+        UPDATE tbl_role_mst
+           SET title=#{role.title}, 
+               role_sh_name=#{role.role_sh_name}, 
+               role_user_level=#{role.role_user_level},
+               update_id="1"
+         WHERE role_id = #{id}
+    </update>
+
+<!-- Logical Delete Data -->
+    <update id="logicalDeleteRole">
+        UPDATE tbl_role_mst
+           SET del_flag = 1
+         WHERE role_id = #{id}
+    </update>
+
+<!-- Logical Delete Multiple Role -->
+    <delete id="deleteMultipleRole">
+        UPDATE tbl_role_mst
+           SET del_flag = 1
+         WHERE role_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+<!-- Restore Data -->
+    <update id="restoreRole">
+        UPDATE tbl_role_mst
+           SET del_flag = 0
+         WHERE role_id = #{id}
+    </update>
+
+<!-- Logical Restore Multiple Role -->
+    <delete id="restoreMultipleRole">
+        UPDATE tbl_role_mst
+           SET del_flag = 0
+         WHERE role_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

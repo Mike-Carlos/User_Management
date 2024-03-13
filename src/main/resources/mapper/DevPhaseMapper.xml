@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper for tbl DevPhase   -->
+<mapper namespace="com.controlcenter.controlcenter.dao.DevPhaseDao">
+
+<!-- Fetch Data -->
+    <select id="getAllDevPhase" resultType="com.controlcenter.controlcenter.model.DevPhaseOutput">
+        SELECT dev_phase_id, dev_phase_name, dev_phase_sh_name, del_flag
+          FROM tbl_dev_phase_mst
+         WHERE del_flag = 0
+      ORDER BY dev_phase_id DESC, reg_date DESC;
+    </select>
+
+    <select id="getDevPhaseById" resultType="com.controlcenter.controlcenter.model.DevPhaseOutput">
+        SELECT dev_phase_id, dev_phase_name, dev_phase_sh_name, del_flag
+          FROM tbl_dev_phase_mst
+         WHERE dev_phase_id = #{id}
+    </select>
+
+<!-- Add Data -->
+    <insert id="addDevPhase" parameterType="com.controlcenter.controlcenter.model.DevPhaseInput">
+        INSERT INTO tbl_dev_phase_mst(
+            dev_phase_name, 
+            dev_phase_sh_name, 
+            reg_id
+        )
+        VALUES (
+            #{dev_phase_name}, 
+            #{dev_phase_sh_name}, 
+            1
+        );
+    </insert>
+    
+<!-- Update Data -->
+    <update id="editDevPhaseInfo" parameterType="map">
+        UPDATE tbl_dev_phase_mst
+           SET dev_phase_name=#{devPhase.dev_phase_name}, 
+               dev_phase_sh_name=#{devPhase.dev_phase_sh_name},
+               update_id = 1
+         WHERE dev_phase_id = #{id}
+    </update>
+
+<!-- Logical Delete Data -->
+    <update id="logicalDeleteDevPhase">
+        UPDATE tbl_dev_phase_mst
+           SET del_flag = 1
+        WHERE dev_phase_id = #{id}
+    </update>
+
+<!-- Logical Delete Multiple -->
+    <delete id="deleteMultipleDevPhase">
+        UPDATE tbl_dev_phase_mst
+           SET del_flag = 1
+         WHERE dev_phase_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+<!-- Restore Data -->
+    <update id="restoreDevPhase">
+        UPDATE tbl_dev_phase_mst
+           SET del_flag = 0
+        WHERE dev_phase_id = #{id}
+    </update>
+
+</mapper>

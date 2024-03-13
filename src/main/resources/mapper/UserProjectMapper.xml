@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper for tbl UserProject   -->
+<mapper namespace="com.controlcenter.controlcenter.dao.UserProjectDao">
+
+<!-- Fetch Data -->
+    <select id="getAllUserProject" resultType="com.controlcenter.controlcenter.model.UserProjectOutput">
+        SELECT upid, emp_id, proj_id, del_flag
+          FROM tbl_user_project
+         WHERE del_flag = 0
+      ORDER BY upid DESC, reg_date DESC;
+    </select>
+
+    <select id="getUserProjectById" resultType="com.controlcenter.controlcenter.model.UserProjectOutput">
+        SELECT upid, emp_id, proj_id, del_flag
+          FROM tbl_user_project
+         WHERE upid = #{id};
+    </select>
+
+<!-- Add Data -->
+    <insert id="addUserProject" parameterType="com.controlcenter.controlcenter.model.UserProjectInput">
+        INSERT INTO tbl_user_project (
+            emp_id, 
+            proj_id, 
+            reg_id
+        )
+        VALUES (
+            #{emp_id}, 
+            #{proj_id}, 
+            1
+        );
+    </insert>
+    
+<!-- Update Data -->
+    <update id="editUserProjectInfo" parameterType="map">
+        UPDATE tbl_user_project
+           SET emp_id=#{userProject.emp_id},
+               proj_id=#{userProject.proj_id},
+               update_id = 1
+         WHERE upid = #{id}
+    </update>
+
+<!-- Logical Delete Data -->
+    <update id="logicalDeleteUserProject">
+        UPDATE tbl_user_project
+           SET del_flag = 1
+        WHERE proj_id = #{id}
+    </update>
+
+<!-- Logical Delete Multiple -->
+    <delete id="deleteMultipleUserProject">
+        UPDATE tbl_user_project
+           SET del_flag = 1
+         WHERE proj_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+<!-- Restore Data -->
+    <update id="restoreUserProject">
+        UPDATE tbl_user_project
+           SET del_flag = 0
+        WHERE proj_id = #{id}
+    </update>
+
+<!-- Define the delete query -->
+    <delete id="permaDeleteProjectMember">
+        DELETE FROM tbl_user_project
+        WHERE proj_id = #{proj_id}
+    </delete>
+</mapper>

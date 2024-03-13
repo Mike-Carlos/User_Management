@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.controlcenter.controlcenter.dao.UserDao">
+    <!-- <select id="findById" parameterType="java.lang.Long" resultType="com.example.entity.YourEntity">
+        SELECT * FROM your_entity_table WHERE id = #{id}
+    </select> -->
+
+    <select id="userTable" resultType="com.controlcenter.controlcenter.model.UserTable">
+        SELECT users.emp_id,
+               users.username,
+               info_master.fname,
+               info_master.lname,
+               position_master.position_sh_name,
+               info_master.email,
+               section_master.section_name,
+               department_master.dept_name,
+               users.reg_date,
+               users.del_flag
+          FROM tbl_personal_info AS info_master
+    INNER JOIN tbl_user AS users ON users.emp_id = info_master.emp_id
+    INNER JOIN tbl_position_mst AS position_master ON users.position_id = position_master.position_id
+    INNER JOIN tbl_section_mst AS section_master ON users.section_id = section_master.section_id
+    INNER JOIN tbl_department_mst AS department_master ON users.dept_id = department_master.dept_id
+         WHERE users.del_flag = 0 AND users.emp_id != 100
+      ORDER BY users.reg_date DESC;
+    </select>
+    <!-- <select id="getUserById" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.UserInfoOutput">
+        SELECT users.emp_id,
+            users.username,
+            users.status_code,
+            users.img_src,
+            users.password,
+            info_master.fname,
+            info_master.mname,
+            info_master.lname,
+            position_master.position_name,
+            position_master.position_id,
+            info_master.email,
+            section_master.section_id,
+            section_master.section_name,
+            department_master.dept_id,
+            department_master.dept_name,
+            users.del_flag,
+            GROUP_CONCAT(COALESCE(role_master.role_user_level, '')) AS role_user_level_string
+        FROM tbl_personal_info AS info_master
+        INNER JOIN tbl_user AS users ON users.emp_id = info_master.emp_id
+        INNER JOIN tbl_multi_role AS multi_role ON users.emp_id = multi_role.emp_id
+        INNER JOIN tbl_role_mst AS role_master ON multi_role.role_id = role_master.role_id
+        INNER JOIN tbl_position_mst AS position_master ON users.position_id = position_master.position_id
+        INNER JOIN tbl_section_mst AS section_master ON users.section_id = section_master.section_id
+        INNER JOIN tbl_department_mst AS department_master ON users.dept_id = department_master.dept_id
+        INNER JOIN tbl_status_mst AS user_status ON users.status_code = user_status.status_code
+        WHERE users.del_flag = 0 AND users.emp_id = #{id}
+        GROUP BY users.emp_id, users.username, users.status_code, users.img_src, users.password, info_master.fname, info_master.mname, info_master.lname, position_master.position_name, position_master.position_id, info_master.email, section_master.section_id, section_master.section_name, department_master.dept_id, department_master.dept_name, users.del_flag;
+
+    </select> -->
+    <select id="getUserById" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.UserInfoOutput">
+        SELECT users.emp_id,
+               users.username,
+               users.status_code,
+               users.img_src,
+               users.password,
+               info_master.fname,
+               info_master.mname,
+               info_master.lname,
+               position_master.position_name,
+               position_master.position_id,
+               info_master.email,
+               section_master.section_id,
+               section_master.section_name,
+               department_master.dept_id,
+               department_master.dept_name,
+               role_master.title,
+               users.del_flag
+          FROM tbl_personal_info AS info_master
+    INNER JOIN tbl_user AS users ON users.emp_id = info_master.emp_id
+    INNER JOIN tbl_role_mst AS role_master ON users.role_id = role_master.role_id
+    INNER JOIN tbl_position_mst AS position_master ON users.position_id = position_master.position_id
+    INNER JOIN tbl_section_mst AS section_master ON users.section_id = section_master.section_id
+    INNER JOIN tbl_department_mst AS department_master ON users.dept_id = department_master.dept_id
+    INNER JOIN tbl_status_mst AS user_status ON users.status_code = user_status.status_code
+         WHERE users.del_flag = 0 AND users.emp_id = #{id};
+    </select>
+
+    <select id="getMultipleUserById" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.UserInfoOutput">
+        SELECT users.emp_id,
+               users.username,
+               users.status_code,
+               users.img_src,
+               users.password,
+               info_master.fname,
+               info_master.mname,
+               info_master.lname,
+               position_master.position_name,
+               position_master.position_id,
+               info_master.email,
+               section_master.section_id,
+               section_master.section_name,
+               department_master.dept_id,
+               department_master.dept_name,
+               role_master.title,
+               users.del_flag
+          FROM tbl_personal_info AS info_master
+    INNER JOIN tbl_user AS users ON users.emp_id = info_master.emp_id
+    INNER JOIN tbl_role_mst AS role_master ON users.role_id = role_master.role_id
+    INNER JOIN tbl_position_mst AS position_master ON users.position_id = position_master.position_id
+    INNER JOIN tbl_section_mst AS section_master ON users.section_id = section_master.section_id
+    INNER JOIN tbl_department_mst AS department_master ON users.dept_id = department_master.dept_id
+    INNER JOIN tbl_status_mst AS user_status ON users.status_code = user_status.status_code
+         WHERE users.del_flag = 0 AND users.emp_id = #{id};
+    </select>
+
+    <select id="getAllUser" resultType="com.controlcenter.controlcenter.model.UserOutput">
+        SELECT emp_id,
+               username,
+               password,
+               position_id,
+               dept_id,
+               section_id,
+               <!-- role_id, -->
+               status_code,
+               img_src
+          FROM tbl_user
+         WHERE del_flag = 0 AND emp_id != 100
+         ORDER BY emp_id DESC, reg_date DESC;
+    </select>
+
+    <select id="getAllPossibleManager" resultType="com.controlcenter.controlcenter.model.UserInfoOutput">
+        SELECT users.emp_id,
+               users.username,
+               users.status_code,
+               users.img_src,
+               users.password,
+               info_master.fname,
+               info_master.mname,
+               info_master.lname,
+               position_master.position_name,
+               position_master.position_id,
+               info_master.email,
+               section_master.section_id,
+               section_master.section_name,
+               department_master.dept_id,
+               department_master.dept_name,
+               role_master.title,
+               users.del_flag
+          FROM tbl_personal_info AS info_master
+    INNER JOIN tbl_user AS users ON users.emp_id = info_master.emp_id
+    INNER JOIN tbl_role_mst AS role_master ON users.role_id = role_master.role_id
+    INNER JOIN tbl_position_mst AS position_master ON users.position_id = position_master.position_id
+    INNER JOIN tbl_section_mst AS section_master ON users.section_id = section_master.section_id
+    INNER JOIN tbl_department_mst AS department_master ON users.dept_id = department_master.dept_id
+    INNER JOIN tbl_status_mst AS user_status ON users.status_code = user_status.status_code
+         WHERE users.del_flag = 0 
+         AND users.emp_id != 100 
+         AND (users.position_id = 5 
+         OR users.position_id = 6 
+         OR users.position_id = 7 
+         OR users.position_id = 8 
+         OR users.position_id = 9 
+         OR users.position_id = 10);
+    </select>
+
+    <select id="getUserByUsername" resultType="com.controlcenter.controlcenter.model.UserOutput">
+        SELECT emp_id,
+               username,
+               password,
+               position_id,
+               dept_id,
+               section_id,
+               <!-- role_id, -->
+               status_code,
+               img_src
+          FROM tbl_user
+         WHERE username COLLATE utf8mb4_bin = #{username}
+    </select>
+    
+    <insert id="insertUser" parameterType="com.controlcenter.controlcenter.model.UserInput">
+        INSERT INTO tbl_user (
+            emp_id, 
+            username, 
+            password, 
+            position_id, 
+            dept_id, 
+            section_id, 
+            <!-- role_id, -->
+            status_code, 
+            img_src, 
+            reg_id
+        )
+        VALUES (
+            #{emp_id}, 
+            #{username}, 
+            #{password}, 
+            #{position_id}, 
+            #{dept_id}, 
+            #{section_id},
+            <!-- #{role_id},  -->
+            #{status_code}, 
+            #{img_src}, 
+            1
+        );
+    </insert>
+
+    <update id="editUser" parameterType="map">
+        UPDATE tbl_user
+           SET emp_id=#{user.emp_id},
+               username=#{user.username},
+               password=#{user.password},
+               position_id=#{user.position_id},
+               dept_id=#{user.dept_id},
+               section_id=#{user.section_id},
+               <!-- role_id=#{user.role_id}, -->
+               status_code=#{user.status_code},
+               img_src=#{user.img_src},
+               update_id = 1
+         WHERE emp_id = #{id}
+    </update>
+
+    <select id="getUsername" resultType="com.controlcenter.controlcenter.model.UserOutput">
+        SELECT emp_id,
+               username,
+               password,
+               position_id,
+               dept_id,
+               section_id,
+               role_id,
+               status_code,
+               img_src
+          FROM tbl_user
+         WHERE username COLLATE utf8mb4_bin = #{username}
+    </select>
+
+    <!-- Login -->
+    <select id="getByUsername" resultType="com.controlcenter.controlcenter.model.UserOutput">
+        SELECT emp_id,
+               username,
+               password,
+               position_id,
+               dept_id,
+               section_id,
+               role_id,
+               status_code,
+               img_src
+          FROM tbl_user
+         WHERE username COLLATE utf8mb4_bin = #{username}
+    </select>
+
+    <!-- get all roles of a user -->
+    <select id="getAllRolesOfUser" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.UserRoles">
+        SELECT tuser.emp_id,
+               tmr.role_id,
+               tuser.username,
+               tmr.role_id,
+               troles.role_sh_name
+          FROM tbl_user AS tuser
+            INNER JOIN tbl_multi_role AS tmr
+                ON tuser.emp_id = tmr.emp_id
+            LEFT JOIN tbl_role_mst AS troles
+                ON troles.role_id = tmr.role_id
+         WHERE tuser.emp_id = #{emp_id} AND tmr.del_flag = 0;
+    </select>
+
+<!-- logical deletion of user -->
+    <update id="logicalDeleteUser" parameterType="java.lang.String">
+        UPDATE tbl_user
+           SET del_flag = 1
+         WHERE emp_id = #{id};
+    </update>
+
+<!-- Logical Delete Multiple -->
+    <delete id="deleteMultipleUser">
+        UPDATE tbl_user
+           SET del_flag = 1
+         WHERE emp_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+<!-- restore user -->
+    <update id="restoreUser" parameterType="java.lang.String">
+        UPDATE tbl_user
+           SET del_flag = 0
+         WHERE emp_id = #{id};
+    </update>
+    
+<!-- change password of user -->
+    <update id="changePassword">
+        UPDATE tbl_user
+           SET password = #{new_password}
+        WHERE emp_id = #{user_id};
+    </update>
+
+<!-- change the profile of the user -->
+    <update id="updateUserPicture" parameterType="com.controlcenter.controlcenter.model.UserInfoOutput">
+        UPDATE tbl_user
+        <set>
+            img_src = #{img_src},
+        </set>
+        WHERE emp_id = #{id}
+    </update>
+
+<!-- get the info of the currently logged in user -->
+<select id="principalInfo" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.UserInfoOutput">
+        SELECT users.emp_id,
+               users.username,
+               users.status_code,
+               users.img_src,
+               users.password,
+               info_master.fname,
+               info_master.mname,
+               info_master.lname,
+               position_master.position_name,
+               position_master.position_id,
+               info_master.email,
+               section_master.section_id,
+               section_master.section_name,
+               department_master.dept_id,
+               department_master.dept_name,
+               role_master.title,
+               users.del_flag
+          FROM tbl_personal_info AS info_master
+    INNER JOIN tbl_user AS users ON users.emp_id = info_master.emp_id
+    INNER JOIN tbl_role_mst AS role_master ON users.role_id = role_master.role_id
+    INNER JOIN tbl_position_mst AS position_master ON users.position_id = position_master.position_id
+    INNER JOIN tbl_section_mst AS section_master ON users.section_id = section_master.section_id
+    INNER JOIN tbl_department_mst AS department_master ON users.dept_id = department_master.dept_id
+    INNER JOIN tbl_status_mst AS user_status ON users.status_code = user_status.status_code
+         WHERE users.del_flag = 0 AND users.emp_id = #{id};
+    </select>
+
+    <!-- <insert id="addAccount" parameterType="map">
+        INSERT INTO tbl_user(emp_id, username, password, position_id, dept_id, section_id, status_code, img_src, reg_id, update_id)
+             VALUES (#{account.emp_id}, #{account.username}, #{account.password}, #{account.position_id}, #{account.dept_id}, #{account.section_id}, #{account.status_code}, #{account.img_src}, #{account.reg_id}, #{account.update_id});
+
+        INSERT INTO tbl_personal_info(emp_id, fname, lname, mname, email, reg_id, update_id)
+             VALUES (#{account.emp_id}, #{account.fname}, #{account.lname}, #{account.mname}, #{account.email}, #{account.reg_id}, #{account.update_id});
+    </insert> -->
+    <!-- <insert id="insertUserBatch" parameterType="java.util.List">
+        INSERT INTO tbl_user(emp_id, username, password, position_id, dept_id, section_id, status_code, img_src, reg_id, update_id) VALUES
+        <foreach collection="list" item="user" separator=",">
+            (#{emp_id}, #{username}, #{password}, #{position_id}, #{dept_id}, #{section_id}, #{status_code}, #{img_src}, #{reg_id}, #{update_id})
+        </foreach>
+    </insert> -->
+
+    <!-- <insert id="save" parameterType="com.example.entity.YourEntity">
+        INSERT INTO your_entity_table (name) VALUES (#{name})
+    </insert>
+
+    <delete id="delete" parameterType="com.example.entity.YourEntity">
+        DELETE FROM your_entity_table WHERE id = #{id}
+    </delete> -->
+</mapper>

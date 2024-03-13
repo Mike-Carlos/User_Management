@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper for tbl project   -->
+<mapper namespace="com.controlcenter.controlcenter.dao.ProjectDao">
+
+    <select id="projectTable" resultType="com.controlcenter.controlcenter.model.ProjectTable">
+       SELECT tproj.proj_id,
+              tproj.proj_name,
+              tc.client_name,
+              tproj.start_date,
+              tproj.end_date, 
+              devtype.dev_type_name,
+              (SELECT COUNT(*) FROM tbl_user_project AS tup WHERE tup.proj_id = tproj.proj_id AND tup.emp_id != 100) AS members,
+              ps.proj_status_name
+         FROM tbl_project_mst AS tproj
+              INNER JOIN tbl_proj_info AS tpi 
+                  ON tproj.proj_id = tpi.proj_id
+              LEFT JOIN tbl_clients_mst AS tc 
+                  ON tpi.client_id = tc.client_id
+              LEFT JOIN tbl_dev_type_mst AS devtype
+                  ON tpi.dev_type_id = devtype.dev_type_id
+              LEFT JOIN tbl_proj_status_mst AS ps
+                  ON tpi.proj_status_id = ps.proj_status_id
+        WHERE tproj.del_flag = 0
+     ORDER BY tproj.proj_id DESC, tproj.reg_date DESC;
+    </select>
+<!-- Fetch Data -->
+    <select id="getAllProject" resultType="com.controlcenter.controlcenter.model.ProjectOutput">
+       SELECT proj_id, proj_name, proj_code, proj_description, start_date, end_date, del_flag
+         FROM tbl_project_mst
+        WHERE del_flag = 0
+     ORDER BY proj_id DESC, reg_date DESC;
+    </select>
+
+    <select id="getProjectById" resultType="com.controlcenter.controlcenter.model.ProjectOutput">
+       SELECT proj_id, proj_name, proj_code, proj_description, start_date, end_date, del_flag
+         FROM tbl_project_mst
+        WHERE proj_id = #{id};
+    </select>
+
+<!-- Add Data -->
+    <insert id="addProject" parameterType="com.controlcenter.controlcenter.model.ProjectOutput" useGeneratedKeys="true" keyProperty="proj_id">
+        INSERT INTO tbl_project_mst(
+            proj_name, proj_code, 
+            proj_description, 
+            start_date, 
+            end_date, 
+            reg_id
+        )
+        VALUES (
+            #{proj_name},
+            #{proj_code}, 
+            #{proj_description}, 
+            #{start_date}, 
+            #{end_date}, 
+            1
+        );
+    </insert>
+    
+<!-- Update Data -->
+    <update id="editProjectInfo" parameterType="map">
+        UPDATE tbl_project_mst
+           SET proj_name=#{project.proj_name},
+               proj_code=#{project.proj_code}, 
+               proj_description=#{project.proj_description},
+               start_date=#{project.start_date}, 
+               end_date=#{project.end_date},
+               update_id = 1
+        WHERE proj_id = #{id}
+    </update>
+
+<!-- Logical Delete Data -->
+    <update id="logicalDeleteProject" parameterType="java.lang.String">
+        UPDATE tbl_project_mst
+           SET del_flag=1
+        WHERE proj_id = #{id}
+    </update>
+
+<!-- Logical Delete Multiple -->
+    <delete id="deleteMultipleProject">
+        UPDATE tbl_project_mst
+           SET del_flag = 1
+         WHERE proj_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+<!-- Restore Data -->
+    <update id="restoreProject" parameterType="java.lang.String">
+        UPDATE tbl_project_mst
+           SET del_flag=0
+        WHERE proj_id = #{id}
+    </update>
+
+<!-- Define the delete query -->
+    <delete id="permaDeleteRoleOfUser">
+        DELETE FROM tbl_multi_role
+        WHERE emp_id = #{emp_id} AND role_id = #{role_id}
+    </delete>
+
+<!-- Fetch Data -->
+    <select id="getAllProjects" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.ProjectOutput">
+       SELECT proj_id, proj_name, proj_code, proj_description, start_date, end_date, del_flag
+         FROM tbl_project_mst
+        WHERE proj_id = #{proj_id} AND del_flag = 0
+    </select>
+
+<!-- Select all managers of a project -->
+    <select id="getAllManagersOfProject" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.UserInfoOutput">
+        SELECT tmanager.emp_id,
+               tpi.fname,
+               tpi.lname
+          FROM tbl_project_mst AS tproj
+            INNER JOIN tbl_proj_manager AS tmanager
+                ON tproj.proj_id = tmanager.proj_id
+            LEFT JOIN tbl_personal_info AS tpi
+                ON tpi.emp_id = tmanager.emp_id
+        WHERE tmanager.proj_id = #{proj_id} AND tmanager.del_flag = 0;
+        <!-- AND tup.emp_id != 100 -->
+    </select>
+
+<!-- Select all development phases of a project -->
+    <select id="getAllPhasesOfProject" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.DevPhaseOutput">
+        SELECT tpp.dev_phase_id,
+               tphase.dev_phase_name
+          FROM tbl_project_mst AS tproj
+            INNER JOIN tbl_proj_phase AS tpp
+                ON tproj.proj_id = tpp.proj_id
+            LEFT JOIN tbl_dev_phase_mst AS tphase
+                ON tphase.dev_phase_id = tpp.dev_phase_id
+        WHERE tpp.proj_id = #{proj_id} AND tpp.del_flag = 0;
+    </select>
+
+<!-- Select all members of a project -->
+    <select id="getAllMembersOfProject" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.UserInfoOutput">
+        SELECT tup.emp_id,
+               tpi.fname,
+               tpi.lname,
+               tposition.position_sh_name
+          FROM tbl_project_mst AS tproj
+            INNER JOIN tbl_user_project AS tup
+                ON tproj.proj_id = tup.proj_id
+            LEFT JOIN tbl_personal_info AS tpi
+                ON tpi.emp_id = tup.emp_id
+            LEFT JOIN tbl_user AS tuser
+                ON tuser.emp_id = tup.emp_id
+            LEFT JOIN tbl_position_mst AS tposition
+                ON tposition.position_id = tuser.position_id
+        WHERE tup.proj_id = #{proj_id} AND tup.del_flag = 0 AND tup.emp_id != 100;
+        <!-- AND tup.emp_id != 100 -->
+    </select>
+
+<!-- Select all members of a project -->
+    <select id="getAllMembersOfProjectForTable" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.UserInfoOutput">
+        SELECT tup.emp_id,
+               tpi.fname,
+               tpi.lname,
+               tposition.position_sh_name
+          FROM tbl_project_mst AS tproj
+            INNER JOIN tbl_user_project AS tup
+                ON tproj.proj_id = tup.proj_id
+            LEFT JOIN tbl_personal_info AS tpi
+                ON tpi.emp_id = tup.emp_id
+            LEFT JOIN tbl_user AS tuser
+                ON tuser.emp_id = tup.emp_id
+            LEFT JOIN tbl_position_mst AS tposition
+                ON tposition.position_id = tuser.position_id
+        WHERE tup.proj_id = #{proj_id} AND tup.del_flag = 0 AND tup.emp_id != 100;
+        <!-- AND tup.emp_id != 100 -->
+    </select>
+
+<!-- Select all development technologies of a project -->
+    <select id="getAllTechnologiesOfProject" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.TechnologyOutput">
+        SELECT ttech.tech_id,
+               ttech.tech_name
+          FROM tbl_project_mst AS tproj
+            INNER JOIN tbl_proj_tech AS tpt
+                ON tproj.proj_id = tpt.proj_id
+            LEFT JOIN tbl_technology_mst AS ttech
+                ON ttech.tech_id = tpt.tech_id
+        WHERE tpt.proj_id = #{proj_id} AND tpt.del_flag = 0;
+    </select>
+
+<!-- Select the client of a project -->
+    <select id="getClientOfProject" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.ClientOutput">
+        SELECT tclient.client_id,
+               tclient.client_name
+          FROM tbl_project_mst AS tproj
+            INNER JOIN tbl_proj_info AS tpi
+                ON tproj.proj_id = tpi.proj_id
+            LEFT JOIN tbl_clients_mst AS tclient
+                ON tclient.client_id = tpi.client_id
+        WHERE tpi.proj_id = #{proj_id} AND tpi.del_flag = 0;
+    </select>
+
+<!-- Select the development type of a project -->
+    <select id="getDevelopmentTypeOfProject" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.DevTypeOutput">
+        SELECT tdt.dev_type_id,
+               tdt.dev_type_name
+          FROM tbl_project_mst AS tproj
+            INNER JOIN tbl_proj_info AS tpi
+                ON tproj.proj_id = tpi.proj_id
+            LEFT JOIN tbl_dev_type_mst AS tdt
+                ON tdt.dev_type_id = tpi.dev_type_id
+        WHERE tpi.proj_id = #{proj_id} AND tpi.del_flag = 0;
+    </select>
+
+<!-- Select the status type of a project -->
+    <select id="getStatusOfProject" parameterType="java.lang.String" resultType="com.controlcenter.controlcenter.model.ProjectStatusOutput">
+        SELECT tps.proj_status_id,
+               tps.proj_status_name
+          FROM tbl_project_mst AS tproj
+            INNER JOIN tbl_proj_info AS tpi
+                ON tproj.proj_id = tpi.proj_id
+            LEFT JOIN tbl_proj_status_mst AS tps
+                ON tps.proj_status_id = tpi.proj_status_id
+        WHERE tpi.proj_id = #{proj_id} AND tpi.del_flag = 0;
+    </select>
+</mapper>

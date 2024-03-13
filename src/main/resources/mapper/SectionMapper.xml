@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper for tbl Section   -->
+<mapper namespace="com.controlcenter.controlcenter.dao.SectionDao">
+
+<!-- Fetch Data -->
+    <select id="getAllSection" resultType="com.controlcenter.controlcenter.model.SectionOutput">
+       SELECT
+            s.section_id,
+            s.section_name,
+            s.section_sh_name,
+            s.section_desc,
+            s.dept_id,
+            d.dept_name,
+            s.del_flag
+        FROM
+            tbl_section_mst AS s
+        JOIN
+            tbl_department_mst AS d
+        ON
+            s.dept_id = d.dept_id
+        WHERE
+            s.del_flag = 0
+        ORDER BY
+            s.section_id DESC,
+            s.reg_date DESC;
+    </select>
+
+    <select id="getSectionById" resultType="com.controlcenter.controlcenter.model.SectionOutput">
+       SELECT section_id, section_name, section_sh_name, section_desc, dept_id, del_flag
+         FROM tbl_section_mst
+        WHERE section_id = #{id};
+    </select>
+
+<!-- Add Data -->
+    <insert id="addSection" parameterType="com.controlcenter.controlcenter.model.SectionInput">
+        INSERT INTO tbl_section_mst (
+            section_name, 
+            section_sh_name,
+            section_desc,
+            dept_id,
+            reg_id
+        )
+        VALUES (
+            #{section_name}, 
+            #{section_sh_name},
+            #{section_desc},
+            #{dept_id}, 
+            1
+        );
+    </insert>
+    
+<!-- Update Data -->
+    <update id="editSectionInfo" parameterType="map">
+        UPDATE tbl_section_mst
+           SET section_name=#{section.section_name}, 
+               section_sh_name=#{section.section_sh_name},
+               section_desc=#{section.section_desc},
+               dept_id=#{section.dept_id},
+               update_id = 1
+         WHERE section_id = #{id}
+    </update>
+
+<!-- Logical Delete Data -->
+    <update id="logicalDeleteSection">
+        UPDATE tbl_section_mst
+           SET del_flag = 1
+        WHERE section_id = #{id}
+    </update>
+
+    <update id="deleteMultipleSection">
+        UPDATE tbl_section_mst
+           SET del_flag = 1
+        WHERE section_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+<!-- Restore Data -->
+    <update id="restoreSection">
+        UPDATE tbl_section_mst
+           SET del_flag = 0
+        WHERE section_id = #{id}
+    </update>
+
+</mapper>

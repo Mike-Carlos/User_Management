@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper for tbl MultiRole   -->
+<mapper namespace="com.controlcenter.controlcenter.dao.MultiRoleDao">
+
+<!-- Fetch Data -->
+    <select id="getAllMultiRole" resultType="com.controlcenter.controlcenter.model.MultiRoleOutput">
+        SELECT user_role_id, emp_id, role_id
+         FROM tbl_multi_role
+        WHERE del_flag = 0
+     ORDER BY user_role_id DESC, reg_date DESC;
+    </select>
+
+    <select id="getMultiRoleById" resultType="com.controlcenter.controlcenter.model.MultiRoleOutput">
+        SELECT user_role_id, emp_id, role_id, del_flag
+         FROM tbl_multi_role
+        WHERE user_role_id = #{id}
+    </select>
+
+<!-- Add Data -->
+    <insert id="addMultiRole" parameterType="java.util.List">
+        INSERT INTO tbl_multi_role(
+            emp_id, 
+            role_id, 
+            reg_id
+            )
+        VALUES (
+            #{emp_id}, 
+            #{role_id},
+            1
+            );
+    </insert>
+    <!-- <insert id="addMultiRole" parameterType="java.util.List">
+        <foreach collection="ids" item="id" open="(" separator=";" close=")">
+            INSERT INTO tbl_multi_role (emp_id, role_id, reg_id)
+            VALUES (#{emp_id}, #{id}, 1)
+        </foreach>
+    </insert> -->
+
+    
+<!-- Update Data -->
+    <update id="editMultiRoleInfo" parameterType="map">
+        UPDATE tbl_multi_role
+           SET emp_id=#{multiRole.emp_id}, 
+               role_id=#{multiRole.role_id},
+               update_id = 1
+         WHERE user_role_id = #{id};
+    </update>
+
+<!-- Logical Delete Data -->
+    <update id="logicalDeleteMultiRole">
+        UPDATE tbl_multi_role
+           SET del_flag = 1
+        WHERE emp_id = #{id}
+    </update>
+
+<!-- Logical Delete Multiple -->
+    <delete id="deleteMultipleMultiRole">
+        UPDATE tbl_multi_role
+           SET del_flag = 1
+         WHERE emp_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+<!-- Restore Data --> 
+    <update id="restoreMultiRole">
+        UPDATE tbl_multi_role
+           SET del_flag = 0
+        WHERE emp_id = #{id}
+    </update>
+
+    <!-- Define the delete query -->
+    <delete id="permaDeleteRoleOfUser">
+        DELETE FROM tbl_multi_role
+        WHERE emp_id = #{emp_id} AND role_id = #{role_id}
+    </delete>
+</mapper>
