@@ -2,7 +2,7 @@
 
 import DashboardHandler from "./pages/Dashboard";
 import { useDispatch, useSelector } from 'react-redux';
-import Login from './components/login/Login';
+import LoginPage from './pages/LoginPage';
 import { RootState } from './redux/store/store';
 import Cookies from 'universal-cookie';
 import { useEffect } from 'react';
@@ -57,8 +57,8 @@ function App() {
 					</>
 				) : (
 					<>
-						<Route index element={<Login />} />
-						<Route path="/" element={<Login />} />
+						<Route index element={<LoginPage />} />
+						<Route path="/" element={<LoginPage />} />
 						<Route path="*" element={<Navigate to="/" />} />
 					</>
 				)}
