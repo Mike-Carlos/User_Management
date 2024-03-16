@@ -1,8 +1,0 @@
-.custom-background {
-    background-image: url('../../assets/patterns.jpg');
-    background-repeat: no-repeat;
-    background-color: #d3d3d3; /* Set a fallback background color if the image fails to load */
-    opacity: 0.7;
-   
-    /* Add any additional styling properties as needed */
-  }

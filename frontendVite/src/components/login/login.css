@@ -1,0 +1,21 @@
+.centerLogin {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .custom-background {
+    background-image: url('../../assets/BGBG.jpg');
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    background-attachment: fixed;
+    background-color: #25476A; /* Set a fallback background color if the image fails to load */
+    background-size: cover; /* Ensures the background image covers the entire container */
+    background-position: center; /* Centers the background image */
+    opacity: 99%;
+    
+    /* Add any additional styling properties as needed */
+}
