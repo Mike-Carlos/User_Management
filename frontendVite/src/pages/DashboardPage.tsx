@@ -1,6 +1,8 @@
-import Navbar from "../components/navbar/Navbar";
+//import Navbar from "../components/navbar/Navbar";
 import './../components/login/login.css'
-import UserTable from './../components/dashboard/UserTable';
+
+import Sidebar from "../components/Sidebar/Sidebar";
+import FloatingChart from '../components/charts/FloatingChart';
 
 export default function DashboardPage(){
     return(
@@ -8,12 +10,15 @@ export default function DashboardPage(){
         
         
 
-        <div style={{backgroundColor:"#808080"}}>
+        <div>
         
-        <Navbar />
-        </div>
+        <Sidebar />
         
-       <UserTable />
+        
+    
+       </div>
+
+       <div> <FloatingChart/> </div>
         </>
     );
 }

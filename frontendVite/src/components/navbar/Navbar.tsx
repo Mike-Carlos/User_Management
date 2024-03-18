@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { logout } from "../../redux/saga/sessionSaga"; // Import the logout action
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
@@ -15,7 +16,7 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { useDispatch } from "react-redux";
 import Logo from '../../assets/logo.png'
-
+import Sidebar from "../Sidebar/Sidebar";
 
 const pages = ["Products", "Pricing", "Blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
@@ -51,6 +52,7 @@ export default function Navbar() {
 
   return (
     <>
+      
       <AppBar position="static" sx={{ backgroundColor: "#254768" }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
