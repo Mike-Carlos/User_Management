@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
 import { alpha } from "@mui/material/styles";
@@ -22,6 +23,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import EditIcon from "@mui/icons-material/Edit";
+import InputBase from "@mui/material/InputBase";
+import SearchIcon from "@mui/icons-material/Search";
+
+
 
 interface Data {
   id: number;
@@ -90,10 +95,6 @@ function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort<T>(
   array: readonly T[],
   comparator: (a: T, b: T) => number
@@ -159,6 +160,7 @@ interface EnhancedTableProps {
   order: Order;
   orderBy: string;
   rowCount: number;
+  onRequestFilter: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
@@ -169,6 +171,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     numSelected,
     rowCount,
     onRequestSort,
+    onRequestFilter,
   } = props;
   const createSortHandler =
     (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
@@ -177,10 +180,11 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
   return (
     <TableHead>
-      <TableRow>
-        <TableCell padding="checkbox">
+      <TableRow style={{ backgroundColor: "#25476A" }}>
+        <TableCell padding="checkbox"  style={{ color: "#ffffff" }} // Change text color to white
+        >
           <Checkbox
-            color="primary"
+            style={{ color: "#ffffff" }}
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
@@ -195,6 +199,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
+            style={{ color: "#ffffff" }} // Change text color to white
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -210,67 +215,14 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell align="right"  style={{ color: "#ffffff" }}>
+         Actions
+        </TableCell>
       </TableRow>
     </TableHead>
   );
 }
 
-interface EnhancedTableToolbarProps {
-  numSelected: number;
-}
-
-function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
-
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Nutrition
-        </Typography>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
-  );
-}
 export default function UserTable() {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Data>("calories");
@@ -278,6 +230,8 @@ export default function UserTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [filter, setFilter] = React.useState("");
+  const [editableRowId, setEditableRowId] = React.useState<number | null>(null);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -316,6 +270,10 @@ export default function UserTable() {
     setSelected(newSelected);
   };
 
+  const handleDoubleClick = (event: React.MouseEvent<unknown>, id: number) => {
+    setEditableRowId(id);
+  };
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -333,23 +291,53 @@ export default function UserTable() {
 
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
+  const handleRequestFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilter(event.target.value);
+  };
+
+  const filteredRows = filter
+    ? rows.filter((row) =>
+        row.name.toLowerCase().includes(filter.toLowerCase())
+      )
+    : rows;
+
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredRows.length) : 0;
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
+      stableSort(filteredRows, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [order, orderBy, page, rowsPerPage]
+    [order, orderBy, page, rowsPerPage, filteredRows]
   );
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+      <Paper sx={{ width: "100%", mb: 2, marginTop: 8}}
+      elevation={6}>
+        <Toolbar
+          sx={{
+            pl: { sm: 2 },
+            pr: { xs: 1, sm: 1 },
+          }}
+        >
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            variant="h6"
+            id="tableTitle"
+            component="div"
+          >
+            Nutrition
+          </Typography>
+          <InputBase
+            placeholder="Search…"
+            onChange={handleRequestFilter}
+            inputProps={{ "aria-label": "search" }}
+          />
+        </Toolbar>
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -362,7 +350,8 @@ export default function UserTable() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={filteredRows.length}
+              onRequestFilter={handleRequestFilter}
             />
             <TableBody>
               {visibleRows.map((row, index) => {
@@ -372,7 +361,7 @@ export default function UserTable() {
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.id)}
+                    onDoubleClick={(event) => handleDoubleClick(event, row.id)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
@@ -383,6 +372,7 @@ export default function UserTable() {
                     <TableCell padding="checkbox">
                       <Checkbox
                         color="primary"
+                        onClick={(event) => handleClick(event, row.id)}
                         checked={isItemSelected}
                         inputProps={{
                           "aria-labelledby": labelId,
@@ -394,6 +384,7 @@ export default function UserTable() {
                       id={labelId}
                       scope="row"
                       padding="none"
+                      contentEditable={editableRowId === row.id}
                     >
                       {row.name}
                     </TableCell>
@@ -428,7 +419,7 @@ export default function UserTable() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={filteredRows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

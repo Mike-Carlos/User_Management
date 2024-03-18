@@ -145,8 +145,8 @@ export default function Sidebar() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Mini variant drawer
+          <Typography variant="h5" noWrap component="div">
+            Control Center
           </Typography>
           <IconButton
             color="inherit"
@@ -174,7 +174,7 @@ export default function Sidebar() {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          {['Users', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: 'block' }}>
               <ListItemButton
                 sx={{
@@ -192,7 +192,7 @@ export default function Sidebar() {
                     color: '#FFFFFF', // Set icon color to white
                   }}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  {index % 2 === 0 ? <AccountCircleIcon /> : <MailIcon />}
                 </ListItemIcon>
                 <ListItemText primary={text} sx={{ opacity: open ? 1 : 0, color: '#FFFFFF' }} />
               </ListItemButton>
