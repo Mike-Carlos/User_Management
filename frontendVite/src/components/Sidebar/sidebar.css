@@ -4,9 +4,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+  } 
 
-  .custom-background {
+  .sidebarBG {
     background-image: url('../../assets/Design.png');
     background-repeat: no-repeat;
     height: 100vh;

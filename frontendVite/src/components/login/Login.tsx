@@ -44,7 +44,7 @@ export default function Login() {
   const [helperText, setHelperText] = useState("");
 
   const errorMessage = useSelector((state: RootState) => state.sessionReducer.error);
-  const [error, setErrorMessage] = React.useState<string | undefined>("");
+  const [error, setErrorMessage] = React.useState<string | undefined>("Username or Password does not exist!");
 
   const navigate = useNavigate();
 
@@ -52,6 +52,7 @@ export default function Login() {
     event.preventDefault();
     dispatch(login({ username, password }));
     dispatch(clearError());
+    
   };
 
   
@@ -63,25 +64,26 @@ export default function Login() {
        
       <Container component="main" maxWidth="xs"
       sx={{
-        display:"flex",
-        marginTop:"15vh",
-        marginLeft: { xs: 0, sm: "100vh" }, // Adjust the margin for different screen sizes
-    "@media (max-width: 600px)": { // Media query for small screens (xs)
-      marginLeft: 0, // Reset margin for extra small screens
-    }
-      }} >
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center", // Center items horizontally
+    justifyContent: "center", // Center items vertically
+    height: "100vh", // Set height to full viewport height
+  }}>
         
         <CssBaseline />
        
         <Box
           sx={{
-            marginTop: 8,
+            opacity: 0.9,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
           }}
         >
-          <Card variant="outlined"  >
+          <Card variant="outlined" sx={{
+            background:"#25476A"
+          }}>
           
             {" "}
             {/* Added Card component with outlined variant */}

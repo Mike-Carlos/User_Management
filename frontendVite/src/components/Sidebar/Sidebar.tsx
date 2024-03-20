@@ -24,6 +24,10 @@ import UserTable from '../dashboard/UserTable';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { logout } from "../../redux/saga/sessionSaga"; // Import the logout action
 import { useDispatch } from 'react-redux';
+import "./sidebar.css"; // Import styles object from CSS module
+
+
+
 
 const drawerWidth = 240;
 
@@ -145,7 +149,8 @@ export default function Sidebar() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h5" noWrap component="div">
+          
+          <Typography variant="h5" >
             Control Center
           </Typography>
           <IconButton
@@ -227,8 +232,11 @@ export default function Sidebar() {
           ))}
         </List>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }} className="sidebarBG" >
+ 
         <UserTable />
+   
       </Box>
     </Box>
   );

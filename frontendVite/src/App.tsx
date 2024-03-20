@@ -21,7 +21,7 @@ function App() {
 
 	useEffect(() => {
 		// Check if the user is authenticated in localStorage
-		const isAuthenticated = localStorage.getItem('isAuthenticated') === 'false';
+		const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
 
 		if (isAuthenticated) {
 			// If the user is authenticated, call the login API to get user info

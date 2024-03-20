@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUsersFetch } from './../../redux/state/userState'; // Import your action creator
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -25,6 +28,10 @@ import { visuallyHidden } from "@mui/utils";
 import EditIcon from "@mui/icons-material/Edit";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+import { RootState } from "../../redux/store/store";
+import { userSlice } from './../../redux/state/userState';
+
+
 
 
 
@@ -35,6 +42,8 @@ interface Data {
   fat: number;
   name: string;
   protein: number;
+  section: number;
+  department: string;
 }
 
 function createData(
@@ -43,7 +52,9 @@ function createData(
   calories: number,
   fat: number,
   carbs: number,
-  protein: number
+  protein: number,
+  section: number,
+  department: string
 ): Data {
   return {
     id,
@@ -52,24 +63,12 @@ function createData(
     fat,
     carbs,
     protein,
+    section,
+    department
   };
 }
 
-const rows = [
-  createData(1, "Cupcake", 305, 3.7, 67, 4.3),
-  createData(2, "Donut", 452, 25.0, 51, 4.9),
-  createData(3, "Eclair", 262, 16.0, 24, 6.0),
-  createData(4, "Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData(5, "Gingerbread", 356, 16.0, 49, 3.9),
-  createData(6, "Honeycomb", 408, 3.2, 87, 6.5),
-  createData(7, "Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData(8, "Jelly Bean", 375, 0.0, 94, 0.0),
-  createData(9, "KitKat", 518, 26.0, 65, 7.0),
-  createData(10, "Lollipop", 392, 0.2, 98, 0.0),
-  createData(11, "Marshmallow", 318, 0, 81, 2.0),
-  createData(12, "Nougat", 360, 19.0, 9, 37.0),
-  createData(13, "Oreo", 437, 18.0, 63, 4.0),
-];
+
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -122,31 +121,44 @@ const headCells: readonly HeadCell[] = [
     id: "name",
     numeric: false,
     disablePadding: true,
-    label: "Dessert (100g serving)",
+    label: "username",
   },
   {
     id: "calories",
     numeric: true,
     disablePadding: false,
-    label: "Calories",
+    label: "First Name",
   },
   {
     id: "fat",
     numeric: true,
     disablePadding: false,
-    label: "Fat (g)",
+    label: "Last Name",
   },
   {
     id: "carbs",
     numeric: true,
     disablePadding: false,
-    label: "Carbs (g)",
+    label: "Position",
   },
   {
     id: "protein",
     numeric: true,
     disablePadding: false,
-    label: "Protein (g)",
+    label: "E-Mail",
+  },
+  {
+    id: "section",
+    numeric: true,
+    disablePadding: false,
+    label: "Section",
+  },
+
+  {
+    id: "department",
+    numeric: true,
+    disablePadding: false,
+    label: "Department",
   },
 ];
 
@@ -244,7 +256,7 @@ export default function UserTable() {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
+      const newSelected = userData.map((user) => user.id);
       setSelected(newSelected);
       return;
     }
@@ -295,11 +307,18 @@ export default function UserTable() {
     setFilter(event.target.value);
   };
 
+  const dispatch = useDispatch();
+  const userData = useSelector((state: RootState) => state.userReducer.users);
+
+  useEffect(() => {
+    dispatch(getUsersFetch());
+  }, [dispatch]);
+
   const filteredRows = filter
-    ? rows.filter((row) =>
-        row.name.toLowerCase().includes(filter.toLowerCase())
+    ? userData.filter((user) =>
+        user.name.toLowerCase().includes(filter.toLowerCase())
       )
-    : rows;
+    : userData;
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -317,7 +336,7 @@ export default function UserTable() {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2, marginTop: 8}}
-      elevation={6}>
+      elevation={10}>
         <Toolbar
           sx={{
             pl: { sm: 2 },
@@ -330,7 +349,7 @@ export default function UserTable() {
             id="tableTitle"
             component="div"
           >
-            Nutrition
+            Users
           </Typography>
           <InputBase
             placeholder="Search…"
@@ -353,7 +372,8 @@ export default function UserTable() {
               rowCount={filteredRows.length}
               onRequestFilter={handleRequestFilter}
             />
-            <TableBody>
+            {userData.map((user) => ( 
+            <TableBody key={user.emp_id}>
               {visibleRows.map((row, index) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
@@ -386,13 +406,14 @@ export default function UserTable() {
                       padding="none"
                       contentEditable={editableRowId === row.id}
                     >
-                      {row.name}
+                      {row.username}
                     </TableCell>
-                    <TableCell align="right">{row.calories}</TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
-                    <TableCell align="right">{row.carbs}</TableCell>
-                    <TableCell align="right">{row.protein}</TableCell>
-
+                    <TableCell align="right">{user.username}</TableCell>
+                    <TableCell align="right">{user.fname}</TableCell>
+                    <TableCell align="right">{user.lname}</TableCell>
+                    <TableCell align="right">{user.email}</TableCell>
+                    <TableCell align="right">{user.section_name}</TableCell>
+                    <TableCell align="right">{user.dept_name}</TableCell>
                     <TableCell align="right">
                       <IconButton aria-label="edit">
                         <EditIcon />
@@ -410,10 +431,11 @@ export default function UserTable() {
                     height: (dense ? 33 : 53) * emptyRows,
                   }}
                 >
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={8} />
                 </TableRow>
               )}
             </TableBody>
+            ))}
           </Table>
         </TableContainer>
         <TablePagination
