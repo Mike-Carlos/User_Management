@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getUsersFetch } from './../../redux/state/userState'; // Import your action creator
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getUsersFetch } from "./../../redux/state/userState"; // Import your action creator
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -29,43 +29,43 @@ import EditIcon from "@mui/icons-material/Edit";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import { RootState } from "../../redux/store/store";
-import { userSlice } from './../../redux/state/userState';
+import { LockOutlinedIcon } from '@mui/icons-material/LockOutlined';
 
-
-
-
-
-interface Data {
-  id: number;
-  calories: number;
-  carbs: number;
-  fat: number;
-  name: string;
-  protein: number;
-  section: number;
-  department: string;
+interface User {
+  emp_id: number;
+  username: string;
+  fname: string;
+  lname: string;
+  position_sh_name: string;
+  email: string;
+  section_name: string;
+  dept_name: string;
+  reg_date: Date;
 }
 
-function createData(
-  id: number,
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number,
-  section: number,
-  department: string
-): Data {
-  return {
-    id,
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-    section,
-    department
-  };
+function createUser(
+  emp_id: number,
+  username: string,
+  fname: string,
+  lname: string,
+  position_sh_name: string,
+  email: string,
+  section_name: string,
+  dept_name: string,
+  reg_date: Date,
+):User{
+  return{
+    emp_id,
+    username,
+   fname,
+    lname,
+    position_sh_name,
+    email,
+    section_name,
+    dept_name,
+    reg_date
+  }
+ 
 }
 
 
@@ -111,62 +111,69 @@ function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof Data;
+  id: keyof User;
   label: string;
   numeric: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
   {
-    id: "name",
+    id: "username",
     numeric: false,
     disablePadding: true,
     label: "username",
   },
   {
-    id: "calories",
+    id: "fname",
     numeric: true,
     disablePadding: false,
     label: "First Name",
   },
   {
-    id: "fat",
+    id: "lname",
     numeric: true,
     disablePadding: false,
     label: "Last Name",
   },
   {
-    id: "carbs",
+    id: "position_sh_name",
     numeric: true,
     disablePadding: false,
     label: "Position",
   },
   {
-    id: "protein",
+    id: "email",
     numeric: true,
     disablePadding: false,
     label: "E-Mail",
   },
   {
-    id: "section",
+    id: "section_name",
     numeric: true,
     disablePadding: false,
     label: "Section",
   },
-
   {
-    id: "department",
+    id: "reg_date",
+    numeric: true,
+    disablePadding: false,
+    label: "Created",
+  },
+  
+  {
+    id: "dept_name",
     numeric: true,
     disablePadding: false,
     label: "Department",
   },
+  
 ];
 
 interface EnhancedTableProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof Data
+    property: keyof User
   ) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
@@ -186,14 +193,16 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     onRequestFilter,
   } = props;
   const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof User) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
   return (
     <TableHead>
       <TableRow style={{ backgroundColor: "#25476A" }}>
-        <TableCell padding="checkbox"  style={{ color: "#ffffff" }} // Change text color to white
+        <TableCell
+          padding="checkbox"
+          style={{ color: "#ffffff" }} // Change text color to white
         >
           <Checkbox
             style={{ color: "#ffffff" }}
@@ -227,8 +236,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             </TableSortLabel>
           </TableCell>
         ))}
-        <TableCell align="right"  style={{ color: "#ffffff" }}>
-         Actions
+        <TableCell align="right" style={{ color: "#ffffff" }}>
+          Actions
         </TableCell>
       </TableRow>
     </TableHead>
@@ -247,7 +256,7 @@ export default function UserTable() {
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: keyof Data
+    property: keyof User
   ) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -256,7 +265,7 @@ export default function UserTable() {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = userData.map((user) => user.id);
+      const newSelected = userData.map((user) => user.emp_id);
       setSelected(newSelected);
       return;
     }
@@ -304,7 +313,19 @@ export default function UserTable() {
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
   const handleRequestFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilter(event.target.value);
+    const inputValue = event.target.value.toLowerCase();
+    const filteredData = userData.filter((user: User) =>
+      user.username.toLowerCase().includes(inputValue) ||
+      user.fname.toLowerCase().includes(inputValue) ||
+      user.lname.toLowerCase().includes(inputValue) ||
+      user.position_sh_name.toLowerCase().includes(inputValue) ||
+      user.email.toLowerCase().includes(inputValue) ||
+      user.section_name.toLowerCase().includes(inputValue) ||
+      user.dept_name.toLowerCase().includes(inputValue) ||
+      user.reg_date.toLowerCase().includes(inputValue)
+    );
+    setFilter(inputValue);
+    setPage(0); // Reset to the first page when filtering
   };
 
   const dispatch = useDispatch();
@@ -315,8 +336,8 @@ export default function UserTable() {
   }, [dispatch]);
 
   const filteredRows = filter
-    ? userData.filter((user) =>
-        user.name.toLowerCase().includes(filter.toLowerCase())
+    ? userData.filter((user: User) =>
+        user.username.toLowerCase().includes(filter.toLowerCase())
       )
     : userData;
 
@@ -335,8 +356,7 @@ export default function UserTable() {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2, marginTop: 8}}
-      elevation={10}>
+      <Paper sx={{ width: "100%", mb: 2, marginTop: 8 }} elevation={10}>
         <Toolbar
           sx={{
             pl: { sm: 2 },
@@ -352,11 +372,13 @@ export default function UserTable() {
             Users
           </Typography>
           <InputBase
+             sx={{ borderBottom: 1 }}
             placeholder="Search…"
             onChange={handleRequestFilter}
             inputProps={{ "aria-label": "search" }}
           />
         </Toolbar>
+
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -372,72 +394,54 @@ export default function UserTable() {
               rowCount={filteredRows.length}
               onRequestFilter={handleRequestFilter}
             />
-            {userData.map((user) => ( 
-            <TableBody key={user.emp_id}>
-              {visibleRows.map((row, index) => {
-                const isItemSelected = isSelected(row.id);
-                const labelId = `enhanced-table-checkbox-${index}`;
-
-                return (
-                  <TableRow
-                    hover
-                    onDoubleClick={(event) => handleDoubleClick(event, row.id)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        onClick={(event) => handleClick(event, row.id)}
-                        checked={isItemSelected}
-                        inputProps={{
-                          "aria-labelledby": labelId,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                      contentEditable={editableRowId === row.id}
-                    >
-                      {row.username}
-                    </TableCell>
-                    <TableCell align="right">{user.username}</TableCell>
-                    <TableCell align="right">{user.fname}</TableCell>
-                    <TableCell align="right">{user.lname}</TableCell>
-                    <TableCell align="right">{user.email}</TableCell>
-                    <TableCell align="right">{user.section_name}</TableCell>
-                    <TableCell align="right">{user.dept_name}</TableCell>
-                    <TableCell align="right">
-                      <IconButton aria-label="edit">
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton aria-label="delete">
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
+            <TableBody>
+              {visibleRows.map((user: User) => (
                 <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
+                  key={user.emp_id}
+                  hover
+                  onDoubleClick={(event) =>
+                    handleDoubleClick(event, user.emp_id)
+                  }
+                  role="checkbox"
+                  aria-checked={isSelected(user.emp_id)}
+                  tabIndex={-1}
+                  selected={isSelected(user.emp_id)}
+                  sx={{ cursor: "pointer" }}
                 >
-                  <TableCell colSpan={8} />
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      color="primary"
+                      onClick={(event) => handleClick(event, user.emp_id)}
+                      checked={isSelected(user.emp_id)}
+                      inputProps={{
+                        "aria-labelledby": `enhanced-table-checkbox-${user.emp_id}`,
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell component="th" scope="row" padding="none">
+                    {user.username}
+                  </TableCell>
+                  <TableCell align="right">{user.fname}</TableCell>
+                  <TableCell align="right">{user.lname}</TableCell>
+                  <TableCell align="right">{user.position_sh_name}</TableCell>
+                  <TableCell align="right">{user.email}</TableCell>
+                  <TableCell align="right">{user.section_name}</TableCell>
+                  <TableCell align="right">{user.reg_date}</TableCell>
+                  <TableCell align="right">{user.dept_name}</TableCell>
+                  <TableCell align="right">
+                    <IconButton aria-label="edit">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton aria-label="delete">
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
-              )}
+              ))}
             </TableBody>
-            ))}
           </Table>
         </TableContainer>
+
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"

@@ -30,6 +30,7 @@ import { login } from "../../redux/saga/sessionSaga";
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useNavigate } from 'react-router-dom';
+import logoBlue from './../../assets/logoBlue.png';
 
 
 // TODO remove, this demo shouldn't need to reset the theme.
@@ -70,9 +71,15 @@ export default function Login() {
     justifyContent: "center", // Center items vertically
     height: "100vh", // Set height to full viewport height
   }}>
-        
-        <CssBaseline />
        
+        <CssBaseline />
+        <img src={logoBlue} alt="" 
+        style={{height: "110px",
+        width: "500px",
+        marginBottom: 30
+      }}
+        
+        />
         <Box
           sx={{
             opacity: 0.9,
@@ -99,6 +106,7 @@ export default function Login() {
                 marginLeft: "auto"
               }} 
             >
+               
               <Avatar sx={{ m: 2, bgcolor: "#25476A" }}>
                 <LockOutlinedIcon />
               </Avatar>

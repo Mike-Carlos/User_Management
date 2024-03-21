@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react';
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -25,7 +26,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { logout } from "../../redux/saga/sessionSaga"; // Import the logout action
 import { useDispatch } from 'react-redux';
 import "./sidebar.css"; // Import styles object from CSS module
-
+import logoWhite from './../../assets/logoWhite.png';
 
 
 
@@ -136,7 +137,7 @@ export default function Sidebar() {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open} sx={{ background: '#25476A' }}>
-        <Toolbar>
+        <Toolbar sx={{height: '100%'}}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -150,9 +151,12 @@ export default function Sidebar() {
             <MenuIcon />
           </IconButton>
           
-          <Typography variant="h5" >
-            Control Center
-          </Typography>
+          <img src={logoWhite} alt="" 
+          style={{
+            height: 70,
+            width: 290,
+          }}
+          />
           <IconButton
             color="inherit"
             aria-label="user profile"
