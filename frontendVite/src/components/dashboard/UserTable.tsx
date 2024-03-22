@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,8 +28,17 @@ import { visuallyHidden } from "@mui/utils";
 import EditIcon from "@mui/icons-material/Edit";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import { RootState } from "../../redux/store/store";
-import { LockOutlinedIcon } from '@mui/icons-material/LockOutlined';
+import { LockOutlinedIcon } from "@mui/icons-material/LockOutlined";
+import ViewColumnIcon from "@material-ui/icons/ViewColumn";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { Button } from "@mui/material";
+import * as XLSX from "xlsx"; // Import XLSX library
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import excelLogo from "./../../assets/excel.png";
 
 interface User {
   emp_id: number;
@@ -52,23 +61,20 @@ function createUser(
   email: string,
   section_name: string,
   dept_name: string,
-  reg_date: Date,
-):User{
-  return{
+  reg_date: Date
+): User {
+  return {
     emp_id,
     username,
-   fname,
+    fname,
     lname,
     position_sh_name,
     email,
     section_name,
     dept_name,
-    reg_date
-  }
- 
+    reg_date,
+  };
 }
-
-
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -114,6 +120,8 @@ interface HeadCell {
   id: keyof User;
   label: string;
   numeric: boolean;
+  filterable: boolean;
+  visible: boolean; // Add visible property
 }
 
 const headCells: readonly HeadCell[] = [
@@ -121,52 +129,67 @@ const headCells: readonly HeadCell[] = [
     id: "username",
     numeric: false,
     disablePadding: true,
-    label: "username",
+    label: "Username",
+    filterable: true,
+    visible: true, // Initially visible
   },
   {
     id: "fname",
     numeric: true,
     disablePadding: false,
     label: "First Name",
+    filterable: true,
+    visible: true, // Initially visible
   },
   {
     id: "lname",
     numeric: true,
     disablePadding: false,
     label: "Last Name",
+    filterable: true,
+    visible: true, // Initially visible
   },
   {
     id: "position_sh_name",
     numeric: true,
     disablePadding: false,
     label: "Position",
+    filterable: true,
+    visible: true, // Initially visible
   },
   {
     id: "email",
     numeric: true,
     disablePadding: false,
     label: "E-Mail",
+    filterable: true,
+    visible: true, // Initially visible
   },
   {
     id: "section_name",
     numeric: true,
     disablePadding: false,
     label: "Section",
+    filterable: true,
+    visible: true, // Initially visible
   },
   {
     id: "reg_date",
     numeric: true,
     disablePadding: false,
     label: "Created",
+    filterable: true,
+    visible: true, // Initially visible
   },
-  
+
   {
     id: "dept_name",
     numeric: true,
     disablePadding: false,
     label: "Department",
+    filterable: true,
+    visible: true, // Initially visible
   },
-  
 ];
 
 interface EnhancedTableProps {
@@ -180,6 +203,7 @@ interface EnhancedTableProps {
   orderBy: string;
   rowCount: number;
   onRequestFilter: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  visibleColumns: string[]; // Add visibleColumns prop
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
@@ -191,19 +215,37 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     rowCount,
     onRequestSort,
     onRequestFilter,
+    visibleColumns,
   } = props;
+
   const createSortHandler =
     (property: keyof User) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
+  // Store the original order of the columns
+  const originalHeadCells = React.useMemo(() => headCells, []);
+
+  // Create a map to get the index of each column by its ID
+  const columnIdIndexMap = React.useMemo(() => {
+    const map: Record<string, number> = {};
+    originalHeadCells.forEach((headCell, index) => {
+      map[headCell.id] = index;
+    });
+    return map;
+  }, [originalHeadCells]);
+
+  // Sort visible columns based on the original order
+  const sortedVisibleColumns = React.useMemo(() => {
+    return visibleColumns.slice().sort((a, b) => {
+      return columnIdIndexMap[a] - columnIdIndexMap[b];
+    });
+  }, [visibleColumns, columnIdIndexMap]);
+
   return (
     <TableHead>
       <TableRow style={{ backgroundColor: "#25476A" }}>
-        <TableCell
-          padding="checkbox"
-          style={{ color: "#ffffff" }} // Change text color to white
-        >
+        <TableCell padding="checkbox" style={{ color: "#ffffff" }}>
           <Checkbox
             style={{ color: "#ffffff" }}
             indeterminate={numSelected > 0 && numSelected < rowCount}
@@ -214,28 +256,38 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             }}
           />
         </TableCell>
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? "right" : "left"}
-            padding={headCell.disablePadding ? "none" : "normal"}
-            sortDirection={orderBy === headCell.id ? order : false}
-            style={{ color: "#ffffff" }} // Change text color to white
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : "asc"}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === "desc" ? "sorted descending" : "sorted ascending"}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-        ))}
+        {sortedVisibleColumns.map((columnId) => {
+          const headCell = originalHeadCells.find(
+            (cell) => cell.id === columnId
+          );
+          if (headCell) {
+            return (
+              <TableCell
+                key={headCell.id}
+                align={headCell.numeric ? "right" : "left"}
+                padding={headCell.disablePadding ? "none" : "normal"}
+                sortDirection={orderBy === headCell.id ? order : false}
+                style={{ color: "#ffffff" }}
+              >
+                <TableSortLabel
+                  active={orderBy === headCell.id}
+                  direction={orderBy === headCell.id ? order : "asc"}
+                  onClick={createSortHandler(headCell.id)}
+                >
+                  {headCell.label}
+                  {orderBy === headCell.id ? (
+                    <Box component="span" sx={visuallyHidden}>
+                      {order === "desc"
+                        ? "sorted descending"
+                        : "sorted ascending"}
+                    </Box>
+                  ) : null}
+                </TableSortLabel>
+              </TableCell>
+            );
+          }
+          return null;
+        })}
         <TableCell align="right" style={{ color: "#ffffff" }}>
           Actions
         </TableCell>
@@ -246,14 +298,24 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 export default function UserTable() {
   const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<keyof Data>("calories");
+  const [orderBy, setOrderBy] = React.useState<keyof User>("username");
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [filter, setFilter] = React.useState("");
   const [editableRowId, setEditableRowId] = React.useState<number | null>(null);
+  const [visibleColumns, setVisibleColumns] = React.useState<string[]>(() => {
+    return headCells
+      .filter((headCell) => headCell.visible)
+      .map((headCell) => headCell.id);
+  });
 
+  const handleColumnVisibilityChange = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    setVisibleColumns(event.target.value as string[]);
+  };
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof User
@@ -314,15 +376,16 @@ export default function UserTable() {
 
   const handleRequestFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value.toLowerCase();
-    const filteredData = userData.filter((user: User) =>
-      user.username.toLowerCase().includes(inputValue) ||
-      user.fname.toLowerCase().includes(inputValue) ||
-      user.lname.toLowerCase().includes(inputValue) ||
-      user.position_sh_name.toLowerCase().includes(inputValue) ||
-      user.email.toLowerCase().includes(inputValue) ||
-      user.section_name.toLowerCase().includes(inputValue) ||
-      user.dept_name.toLowerCase().includes(inputValue) ||
-      user.reg_date.toLowerCase().includes(inputValue)
+    const filteredData = userData.filter(
+      (user: User) =>
+        user.username.toLowerCase().includes(inputValue) ||
+        user.fname.toLowerCase().includes(inputValue) ||
+        user.lname.toLowerCase().includes(inputValue) ||
+        user.position_sh_name.toLowerCase().includes(inputValue) ||
+        user.email.toLowerCase().includes(inputValue) ||
+        user.section_name.toLowerCase().includes(inputValue) ||
+        user.dept_name.toLowerCase().includes(inputValue) ||
+        user.reg_date.toString().toLowerCase().includes(inputValue)
     );
     setFilter(inputValue);
     setPage(0); // Reset to the first page when filtering
@@ -330,14 +393,30 @@ export default function UserTable() {
 
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.userReducer.users);
-
+  console.log(userData);
   useEffect(() => {
     dispatch(getUsersFetch());
   }, [dispatch]);
 
+  // Function to handle exporting data as Excel
+  const handleExportExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(filteredRows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+    XLSX.writeFile(workbook, "users.xlsx");
+  };
+
   const filteredRows = filter
-    ? userData.filter((user: User) =>
-        user.username.toLowerCase().includes(filter.toLowerCase())
+    ? userData.filter(
+        (user: User) =>
+          user.username.toLowerCase().includes(filter.toLowerCase()) ||
+          user.fname.toLowerCase().includes(filter.toLowerCase()) ||
+          user.lname.toLowerCase().includes(filter.toLowerCase()) ||
+          user.email.toLowerCase().includes(filter.toLowerCase()) ||
+          user.position_sh_name.toLowerCase().includes(filter.toLowerCase()) ||
+          user.section_name.toLowerCase().includes(filter.toLowerCase()) ||
+          user.dept_name.toLowerCase().includes(filter.toLowerCase()) ||
+          user.reg_date.toString().toLowerCase().includes(filter.toLowerCase())
       )
     : userData;
 
@@ -372,14 +451,51 @@ export default function UserTable() {
             Users
           </Typography>
           <InputBase
-             sx={{ borderBottom: 1 }}
+          color="primary"
+            sx={{ borderBottom: "1px solid black" , width: "60vh"}}
             placeholder="Search…"
             onChange={handleRequestFilter}
             inputProps={{ "aria-label": "search" }}
           />
+          <Select
+          sx={{ paddingLeft: "40px"}}
+            multiple
+            value={visibleColumns}
+            onChange={handleColumnVisibilityChange}
+            input={<InputBase />}
+            renderValue={(selected) => (
+              <IconButton
+                sx={{ paddingRight: "40px"}}
+                size="small"
+                aria-label="View Columns"
+                onClick={(event) => {
+                  // Handle view columns action if needed
+                }}
+              >
+                <ViewColumnIcon color="primary"/>
+                Column
+              </IconButton>
+            )}
+            style={{ marginLeft: "10px" }}
+          >
+            {headCells.map((headCell) => (
+              <MenuItem key={headCell.id} value={headCell.id}>
+                <Checkbox checked={visibleColumns.indexOf(headCell.id) > -1} />
+                {headCell.label}
+              </MenuItem>
+            ))}
+          </Select>
+          <Button
+            sx={{paddingRight: "40px"}}
+            color="success"
+            onClick={handleExportExcel} // Change the handler to handleExportExcel
+          >
+            <FileDownloadIcon /> Export
+            <img src={excelLogo} alt="" style={{ width: "0px" }} />
+          </Button>
         </Toolbar>
 
-        <TableContainer>
+        <TableContainer id="table-container">
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
@@ -393,6 +509,7 @@ export default function UserTable() {
               onRequestSort={handleRequestSort}
               rowCount={filteredRows.length}
               onRequestFilter={handleRequestFilter}
+              visibleColumns={visibleColumns}
             />
             <TableBody>
               {visibleRows.map((user: User) => (
@@ -418,16 +535,11 @@ export default function UserTable() {
                       }}
                     />
                   </TableCell>
-                  <TableCell component="th" scope="row" padding="none">
-                    {user.username}
-                  </TableCell>
-                  <TableCell align="right">{user.fname}</TableCell>
-                  <TableCell align="right">{user.lname}</TableCell>
-                  <TableCell align="right">{user.position_sh_name}</TableCell>
-                  <TableCell align="right">{user.email}</TableCell>
-                  <TableCell align="right">{user.section_name}</TableCell>
-                  <TableCell align="right">{user.reg_date}</TableCell>
-                  <TableCell align="right">{user.dept_name}</TableCell>
+                  {visibleColumns.map((columnId) => (
+                    <TableCell key={columnId} align="right">
+                      {user[columnId]}
+                    </TableCell>
+                  ))}
                   <TableCell align="right">
                     <IconButton aria-label="edit">
                       <EditIcon />
