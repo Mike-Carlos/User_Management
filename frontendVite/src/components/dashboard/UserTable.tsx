@@ -35,7 +35,7 @@ import { LockOutlinedIcon } from "@mui/icons-material/LockOutlined";
 import ViewColumnIcon from "@material-ui/icons/ViewColumn";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { Button } from "@mui/material";
+import { Button, Link } from "@mui/material";
 import * as XLSX from "xlsx"; // Import XLSX library
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import excelLogo from "./../../assets/excel.png";
@@ -223,25 +223,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
       onRequestSort(event, property);
     };
 
-  // Store the original order of the columns
-  const originalHeadCells = React.useMemo(() => headCells, []);
-
-  // Create a map to get the index of each column by its ID
-  const columnIdIndexMap = React.useMemo(() => {
-    const map: Record<string, number> = {};
-    originalHeadCells.forEach((headCell, index) => {
-      map[headCell.id] = index;
-    });
-    return map;
-  }, [originalHeadCells]);
-
-  // Sort visible columns based on the original order
-  const sortedVisibleColumns = React.useMemo(() => {
-    return visibleColumns.slice().sort((a, b) => {
-      return columnIdIndexMap[a] - columnIdIndexMap[b];
-    });
-  }, [visibleColumns, columnIdIndexMap]);
-
   return (
     <TableHead>
       <TableRow style={{ backgroundColor: "#25476A" }}>
@@ -252,14 +233,12 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
             inputProps={{
-              "aria-label": "select all desserts",
+              "aria-label": "select all users",
             }}
           />
         </TableCell>
-        {sortedVisibleColumns.map((columnId) => {
-          const headCell = originalHeadCells.find(
-            (cell) => cell.id === columnId
-          );
+        {visibleColumns.map((columnId) => {
+          const headCell = headCells.find((cell) => cell.id === columnId);
           if (headCell) {
             return (
               <TableCell
@@ -296,13 +275,14 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   );
 }
 
+
 export default function UserTable() {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof User>("username");
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(6);
   const [filter, setFilter] = React.useState("");
   const [editableRowId, setEditableRowId] = React.useState<number | null>(null);
   const [visibleColumns, setVisibleColumns] = React.useState<string[]>(() => {
@@ -316,12 +296,9 @@ export default function UserTable() {
   ) => {
     setVisibleColumns(event.target.value as string[]);
   };
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof User
-  ) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
+  const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof User) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
@@ -392,7 +369,7 @@ export default function UserTable() {
   };
 
   const dispatch = useDispatch();
-  const userData = useSelector((state: RootState) => state.userReducer.users);
+  const userData= useSelector((state: RootState) => state.userReducer.users);
   console.log(userData);
   useEffect(() => {
     dispatch(getUsersFetch());
@@ -422,7 +399,7 @@ export default function UserTable() {
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredRows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - userData.length) : 0;
 
   const visibleRows = React.useMemo(
     () =>
@@ -434,8 +411,8 @@ export default function UserTable() {
   );
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2, marginTop: 8 }} elevation={10}>
+    <Box sx={{ width: "100%" }} >
+      <Paper sx={{ width: "100%", mb: 2, marginTop: 8 ,background: "#f0f8ff"}} elevation={20}>
         <Toolbar
           sx={{
             pl: { sm: 2 },
@@ -497,7 +474,8 @@ export default function UserTable() {
 
         <TableContainer id="table-container">
           <Table
-            sx={{ minWidth: 750 }}
+            sx={{ minWidth: 750, 
+            }}
             aria-labelledby="tableTitle"
             size={dense ? "small" : "medium"}
           >
@@ -512,7 +490,8 @@ export default function UserTable() {
               visibleColumns={visibleColumns}
             />
             <TableBody>
-              {visibleRows.map((user: User) => (
+              {visibleRows.map((user: any) => (
+                // <Link to={`/User{}`}></Link>
                 <TableRow
                   key={user.emp_id}
                   hover
@@ -555,7 +534,7 @@ export default function UserTable() {
         </TableContainer>
 
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[6, 10, 25]}
           component="div"
           count={filteredRows.length}
           rowsPerPage={rowsPerPage}

@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -14,15 +14,13 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CardContent from "@mui/material/CardContent";
 import Card from "@mui/material/Card";
-import './login.css';
-import Logo from '../../assets/logo.png'
+import Logo from '../../assets/logo.png';
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import {  IconButton, Toolbar, useMediaQuery } from "@mui/material";
-import './login.css';
 import { RootState } from "../../redux/store/store";
 import { useSelector } from "react-redux";
 import { clearError } from "../../redux/state/userState";
@@ -33,7 +31,6 @@ import { useNavigate } from 'react-router-dom';
 import logoBlue from './../../assets/logoBlue.png';
 
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Login() {
@@ -43,42 +40,40 @@ export default function Login() {
   const [isValid, setIsValid] = useState(true);
   const [errorIcon, setErrorIcon] = useState<JSX.Element>();
   const [helperText, setHelperText] = useState("");
+  const [error, setError] = useState<string | any>(); // State for error message
 
   const errorMessage = useSelector((state: RootState) => state.sessionReducer.error);
-  const [error, setErrorMessage] = React.useState<string | undefined>("Username or Password does not exist!");
 
   const navigate = useNavigate();
 
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
+  
     dispatch(login({ username, password }));
     dispatch(clearError());
-    
   };
 
-  
+  // Update the error state when errorMessage changes
+  React.useEffect(() => {
+    return setError(errorMessage);
+  }, [errorMessage]);
 
   return (
-
- 
     <ThemeProvider theme={defaultTheme}>
-       
       <Container component="main" maxWidth="xs"
       sx={{
     display: "flex",
     flexDirection: "column",
     alignItems: "center", // Center items horizontally
     justifyContent: "center", // Center items vertically
-    height: "100vh", // Set height to full viewport height
+    height: "80vh", // Set height to full viewport height
   }}>
-       
         <CssBaseline />
         <img src={logoBlue} alt="" 
         style={{height: "110px",
-        width: "500px",
+        width: "400px",
         marginBottom: 30
       }}
-        
         />
         <Box
           sx={{
@@ -86,18 +81,17 @@ export default function Login() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+   
           }}
         >
           <Card variant="outlined" sx={{
             background:"#25476A"
           }}>
-          
             {" "}
-            {/* Added Card component with outlined variant */}
             <CardContent
               sx={{
-                background: "white",
-                width: "60vh",
+                background: "#f0f8ff",
+                width: "40vh",
                 height: "50vh",
                 marginTop: 2,
                 display: "flex",
@@ -106,7 +100,6 @@ export default function Login() {
                 marginLeft: "auto"
               }} 
             >
-               
               <Avatar sx={{ m: 2, bgcolor: "#25476A" }}>
                 <LockOutlinedIcon />
               </Avatar>
@@ -119,58 +112,55 @@ export default function Login() {
                 noValidate
                 sx={{ mt: 1 }}
               >
-             
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="username"
-                    label="Enter Username"
-                    name="username"
-                    autoComplete="username"
-                    autoFocus
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    error={!isValid}
-                    InputProps={{
-                      endAdornment: errorIcon,
-                    }}
-                  />
-               
-          
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    error={!isValid}
-                    InputProps={{
-                      endAdornment: errorIcon,
-                    }}
-                  />
-           
-                
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="username"
+                  label="Enter Username"
+                  name="username"
+                  autoComplete="username"
+                  autoFocus
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  error={!isValid}
+                  InputProps={{
+                    endAdornment: errorIcon,
+                  }}
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  error={!isValid}
+                  InputProps={{
+                    endAdornment: errorIcon,
+                  }}
+                />
+                {error && (
+                  <Typography variant="body2" color="error">
+                    {error}
+                  </Typography>
+                )}
                 <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 ,background:"#25476A"}}
                 >
-                    <Typography color="white">Sign In</Typography>
-                  
+                  <Typography color="white">Sign In</Typography>
                 </Button>
-                
               </Box>
             </CardContent>
           </Card>
         </Box>
-      
       </Container>
     </ThemeProvider>
   );
