@@ -243,7 +243,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             return (
               <TableCell
                 key={headCell.id}
-                align={headCell.numeric ? "right" : "left"}
+                align={headCell.numeric ? "right" : "right"}
                 padding={headCell.disablePadding ? "none" : "normal"}
                 sortDirection={orderBy === headCell.id ? order : false}
                 style={{ color: "#ffffff" }}
@@ -412,7 +412,7 @@ export default function UserTable() {
 
   return (
     <Box sx={{ width: "100%" }} >
-      <Paper sx={{ width: "100%", mb: 2, marginTop: 8 ,background: "#f0f8ff"}} elevation={20}>
+      <Paper sx={{ width: "100%", mb: 2, marginTop: 8 ,background: "#FAF9F6"}} elevation={20}>
         <Toolbar
           sx={{
             pl: { sm: 2 },

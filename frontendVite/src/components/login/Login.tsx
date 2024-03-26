@@ -90,7 +90,7 @@ export default function Login() {
             {" "}
             <CardContent
               sx={{
-                background: "#f0f8ff",
+                background: "#FAF9F6",
                 width: "40vh",
                 height: "50vh",
                 marginTop: 2,
