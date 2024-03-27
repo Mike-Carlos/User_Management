@@ -35,10 +35,12 @@ import { LockOutlinedIcon } from "@mui/icons-material/LockOutlined";
 import ViewColumnIcon from "@material-ui/icons/ViewColumn";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { Button, Link } from "@mui/material";
+import { Button, Fab, Link } from "@mui/material";
 import * as XLSX from "xlsx"; // Import XLSX library
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import excelLogo from "./../../assets/excel.png";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import AddIcon from "@mui/icons-material/Add";
 
 interface User {
   emp_id: number;
@@ -275,14 +277,13 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   );
 }
 
-
 export default function UserTable() {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof User>("username");
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(6);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [filter, setFilter] = React.useState("");
   const [editableRowId, setEditableRowId] = React.useState<number | null>(null);
   const [visibleColumns, setVisibleColumns] = React.useState<string[]>(() => {
@@ -296,9 +297,12 @@ export default function UserTable() {
   ) => {
     setVisibleColumns(event.target.value as string[]);
   };
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof User) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+  const handleRequestSort = (
+    event: React.MouseEvent<unknown>,
+    property: keyof User
+  ) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
@@ -369,7 +373,7 @@ export default function UserTable() {
   };
 
   const dispatch = useDispatch();
-  const userData= useSelector((state: RootState) => state.userReducer.users);
+  const userData = useSelector((state: RootState) => state.userReducer.users);
   console.log(userData);
   useEffect(() => {
     dispatch(getUsersFetch());
@@ -411,8 +415,11 @@ export default function UserTable() {
   );
 
   return (
-    <Box sx={{ width: "100%" }} >
-      <Paper sx={{ width: "100%", mb: 2, marginTop: 8 ,background: "#FAF9F6"}} elevation={20}>
+    <Box sx={{ width: "100%" }}>
+      <Paper
+        sx={{ width: "100%", mb: 2, marginTop: 8, background: "#FAF9F6" }}
+        elevation={20}
+      >
         <Toolbar
           sx={{
             pl: { sm: 2 },
@@ -428,28 +435,28 @@ export default function UserTable() {
             Users
           </Typography>
           <InputBase
-          color="primary"
-            sx={{ borderBottom: "1px solid black" , width: "60vh"}}
+            color="primary"
+            sx={{ borderBottom: "1px solid black", width: "60vh" }}
             placeholder="Search…"
             onChange={handleRequestFilter}
             inputProps={{ "aria-label": "search" }}
           />
           <Select
-          sx={{ paddingLeft: "40px"}}
+            sx={{ paddingLeft: "40px" }}
             multiple
             value={visibleColumns}
             onChange={handleColumnVisibilityChange}
             input={<InputBase />}
             renderValue={(selected) => (
               <IconButton
-                sx={{ paddingRight: "40px"}}
+                sx={{ paddingRight: "40px" }}
                 size="small"
                 aria-label="View Columns"
                 onClick={(event) => {
                   // Handle view columns action if needed
                 }}
               >
-                <ViewColumnIcon color="primary"/>
+                <ViewColumnIcon color="primary" />
                 Column
               </IconButton>
             )}
@@ -463,7 +470,7 @@ export default function UserTable() {
             ))}
           </Select>
           <Button
-            sx={{paddingRight: "40px"}}
+            sx={{ paddingRight: "40px" }}
             color="success"
             onClick={handleExportExcel} // Change the handler to handleExportExcel
           >
@@ -474,8 +481,7 @@ export default function UserTable() {
 
         <TableContainer id="table-container">
           <Table
-            sx={{ minWidth: 750, 
-            }}
+            sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
             size={dense ? "small" : "medium"}
           >
@@ -533,15 +539,60 @@ export default function UserTable() {
           </Table>
         </TableContainer>
 
-        <TablePagination
-          rowsPerPageOptions={[6, 10, 25]}
-          component="div"
-          count={filteredRows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            p: 1,
+            m: 1,
+            bgcolor: "#FAF9F6",
+            borderRadius: 1,
+          }}
+        >
+          <Box sx={{ paddingLeft: "10px" }}>
+            {/* <Button sx={{ marginRight: "8px", color: "#d24e01" }}>
+              <PersonAddIcon sx={{ marginRight: 1, height: "2vh"}}/> Add User
+            </Button> */}
+            <Fab
+              sx={{
+                background: "#ff6f33",
+                color: "white",
+                "&:hover": {
+                  background: "#d24e01", // Change the background color on hover
+                },
+                position: "relative",
+                "&:hover::before": {
+                  content: '"Add User"',
+                  position: "absolute",
+                  top: "-50px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  backgroundColor: "#000",
+                  color: "#fff",
+                  padding: "5px",
+                  borderRadius: "5px",
+                  fontSize: "11px",
+                  opacity: 0.6,
+                },
+              }}
+              aria-label="add"
+              size="small"
+            >
+              <AddIcon />
+            </Fab>
+          </Box>
+          <Box>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={filteredRows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Box>
+        </Box>
       </Paper>
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}

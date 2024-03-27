@@ -16,7 +16,9 @@
     background-color: #25476A; /* Set a fallback background color if the image fails to load */
     background-size: cover; /* Ensures the background image covers the entire container */
     background-position: center; /* Centers the background image */
-    opacity: 99%;
+    opacity: 98%;
+    align-items: center;
+    justify-content: center;
     
     /* Add any additional styling properties as needed */
 }

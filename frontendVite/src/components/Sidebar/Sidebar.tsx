@@ -149,7 +149,7 @@ export default function Sidebar() {
   const [openModal, setOpenModal] = React.useState(false);
   const handleOpen = () => setOpenModal(true);
   const handleClose = () => setOpenModal(false);
-
+  
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -301,9 +301,18 @@ export default function Sidebar() {
         </List>
       </Drawer>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }} className="sidebarBG">
-        <UserProfile />
-        {/* <UserTable/> */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        className="sidebarBG"
+      >
+        {/* <UserProfile /> */}
+        <UserTable/>
       </Box>
     </Box>
   );
