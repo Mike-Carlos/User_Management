@@ -14,41 +14,45 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CardContent from "@mui/material/CardContent";
 import Card from "@mui/material/Card";
-import Logo from '../../assets/logo.png';
+import Logo from "../../assets/logo.png";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import {  IconButton, Toolbar, useMediaQuery } from "@mui/material";
+import { IconButton, Toolbar, useMediaQuery } from "@mui/material";
 import { RootState } from "../../redux/store/store";
 import { useSelector } from "react-redux";
 import { clearError } from "../../redux/state/userState";
 import { login } from "../../redux/saga/sessionSaga";
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { useNavigate } from 'react-router-dom';
-import logoBlue from './../../assets/logoBlue.png';
-
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { useNavigate } from "react-router-dom";
+import logoBlue from "./../../assets/logoBlue.png";
+import Visibility from "@mui/icons-material/Visibility"; // Import Visibility icon
+import VisibilityOff from "@mui/icons-material/VisibilityOff"; // Import VisibilityOff icon
 
 const defaultTheme = createTheme();
 
 export default function Login() {
   const dispatch = useDispatch();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [isValid, setIsValid] = useState(true);
   const [errorIcon, setErrorIcon] = useState<JSX.Element>();
   const [helperText, setHelperText] = useState("");
   const [error, setError] = useState<string | any>(); // State for error message
+  const [showPassword, setShowPassword] = React.useState(false); // State to track whether to show password
 
-  const errorMessage = useSelector((state: RootState) => state.sessionReducer.error);
+  const errorMessage = useSelector(
+    (state: RootState) => state.sessionReducer.error
+  );
 
   const navigate = useNavigate();
 
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
-  
+
     dispatch(login({ username, password }));
     dispatch(clearError());
   };
@@ -60,20 +64,22 @@ export default function Login() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs"
-      sx={{
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center", // Center items horizontally
-    justifyContent: "center", // Center items vertically
-    height: "80vh", // Set height to full viewport height
-  }}>
+      <Container
+        component="main"
+        maxWidth="xs"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center", // Center items horizontally
+          justifyContent: "center", // Center items vertically
+          height: "80vh", // Set height to full viewport height
+        }}
+      >
         <CssBaseline />
-        <img src={logoBlue} alt="" 
-        style={{height: "110px",
-        width: "400px",
-        marginBottom: 30
-      }}
+        <img
+          src={logoBlue}
+          alt=""
+          style={{ height: "110px", width: "400px", marginBottom: 30 }}
         />
         <Box
           sx={{
@@ -81,12 +87,14 @@ export default function Login() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-   
           }}
         >
-          <Card variant="outlined" sx={{
-            background:"#25476A"
-          }}>
+          <Card
+            variant="outlined"
+            sx={{
+              background: "#25476A",
+            }}
+          >
             {" "}
             <CardContent
               sx={{
@@ -97,14 +105,14 @@ export default function Login() {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                marginLeft: "auto"
-              }} 
+                marginLeft: "auto",
+              }}
             >
               <Avatar sx={{ m: 2, bgcolor: "#25476A" }}>
                 <LockOutlinedIcon />
               </Avatar>
               <Typography component="h1" variant="h5">
-                Sign in 
+                Sign in
               </Typography>
               <Box
                 component="form"
@@ -128,21 +136,29 @@ export default function Login() {
                     endAdornment: errorIcon,
                   }}
                 />
-                <TextField
+                 <TextField
                   margin="normal"
                   required
                   fullWidth
                   name="password"
                   label="Password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  error={!isValid}
                   InputProps={{
-                    endAdornment: errorIcon,
+                    endAdornment: (
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    ),
                   }}
+                  error={!isValid}
                 />
                 {error && (
                   <Typography variant="body2" color="error">
@@ -153,7 +169,7 @@ export default function Login() {
                   type="submit"
                   fullWidth
                   variant="contained"
-                  sx={{ mt: 3, mb: 2 ,background:"#25476A"}}
+                  sx={{ mt: 3, mb: 2, background: "#25476A" }}
                 >
                   <Typography color="white">Sign In</Typography>
                 </Button>

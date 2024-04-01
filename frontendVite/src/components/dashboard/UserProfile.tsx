@@ -14,6 +14,7 @@ import {
   TextField,
   ThemeProvider,
   styled,
+  Grid
 } from "@mui/material";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import vinDp from "./../../assets/vinDp.jpg";
@@ -71,7 +72,7 @@ const VisuallyHiddenInput = styled("input")({
 const MenuProps = {
   PaperProps: {
     style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      // maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
       width: 250,
     },
   },
@@ -382,26 +383,29 @@ export default function UserProfile() {
   };
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <Box
-          sx={{ width: "50%", justifyContent: "center", alignItems: "center" }}
-        >
-          <Paper
-            sx={{ width: "100%", mb: 2, marginTop: 8, background: "#FAF9F6" }}
-            elevation={20}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundImage: `url(${patterns})`, // Set the background image
-                backgroundSize: "cover",
-                backgroundRepeat: `no-repeat`,
-              }}
-              width="100%"
-              height="35vh"
-            >
+     <ThemeProvider theme={theme}>
+  <Box sx={{ width: "100%", justifyContent: "center", alignItems: "center" }}>
+    <Paper
+      sx={{
+        width: "100%",
+        mb: 2,
+        marginTop: 8,
+        background: "#FAF9F6",
+      }}
+      elevation={20}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundImage: `url(${patterns})`, // Set the background image
+          backgroundSize: "cover",
+          backgroundRepeat: `no-repeat`,
+        }}
+        width="100%"
+        height="35vh"
+      >
               <div>
                 {/* Display the selected image */}
                 {selectedImage ? (
@@ -482,367 +486,316 @@ export default function UserProfile() {
             sx={{ width: "100%", mb: 2, marginTop: 1, background: "#FAF9F6" }}
             elevation={20}
           >
-            <div style={{ margin: "25px" }}>
-              <Typography variant="h4" style={{ marginTop: "30px" }}>
-                Edit User
-              </Typography>
+           <Grid container spacing={2}>
+  {/* First row of text fields */}
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        disabled
+        label="Associate ID"
+        error={formSubmitted && assocID === ""}
+        helperText={
+          formSubmitted && assocID === "" ? "Associate ID required" : ""
+        }
+        id="outlined-start-adornment"
+        placeholder="Associate ID"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <KeyIcon />{" "}
+            </InputAdornment>
+          ),
+        }}
+        value={assocID}
+        onChange={(e) => setAssocID(e.target.value)}
+      />
+    </FormControl>
+  </Grid>
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        label="Username"
+        error={formSubmitted && username === ""}
+        helperText={
+          formSubmitted && username === "" ? "Username required" : ""
+        }
+        id="outlined-start-adornment"
+        placeholder="Username"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <PermIdentityIcon />{" "}
+            </InputAdornment>
+          ),
+        }}
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+    </FormControl>
+  </Grid>
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        id="outlined-select-currency"
+        select
+        label="Employee Status"
+        value={empStatus}
+        onChange={(e) => setEmpStatus(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <PeopleOutlineIcon
+              style={{ marginRight: "8px", color: "grey" }}
+            />
+          ),
+        }}
+      >
+        <MenuItem key={0} value={"0"}>
+          {"<Select status>"}
+        </MenuItem>
+        {statuses.map((status: any) => (
+          <MenuItem key={status?.status_code} value={status?.status_code}>
+            {status?.status_name}
+          </MenuItem>
+        ))}
+      </TextField>
+      {formSubmitted && empStatus === "0" && (
+        <FormHelperText>Employee Status required</FormHelperText>
+      )}
+    </FormControl>
+  </Grid>
+  
+  {/* Second row of text fields */}
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        label="First Name"
+        id="outlined-start-adornment"
+        error={formSubmitted && firstName === ""}
+        helperText={
+          formSubmitted && firstName === "" ? "First Name required" : ""
+        }
+        placeholder="First Name"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <PermIdentityIcon />{" "}
+            </InputAdornment>
+          ),
+        }}
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+      />
+    </FormControl>
+  </Grid>
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        label="Middle Name"
+        id="outlined-start-adornment"
+        placeholder="Middle Name"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <PermIdentityIcon />{" "}
+            </InputAdornment>
+          ),
+        }}
+        value={middleName}
+        onChange={(e) => setMiddleName(e.target.value)}
+      />
+    </FormControl>
+  </Grid>
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        label="Last Name"
+        error={formSubmitted && lastName === ""}
+        helperText={
+          formSubmitted && lastName === "" ? "Last Name required" : ""
+        }
+        id="outlined-start-adornment"
+        placeholder="Last Name"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <PermIdentityIcon />{" "}
+            </InputAdornment>
+          ),
+        }}
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+      />
+    </FormControl>
+  </Grid>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {/* Start of Assoc id form */}
-                <FormControl>
-                  <TextField
-                    disabled
-                    label="Associate ID"
-                    error={formSubmitted && assocID === ""}
-                    helperText={
-                      formSubmitted && assocID === ""
-                        ? "Associate ID required"
-                        : ""
-                    }
-                    id="outlined-start-adornment"
-                    placeholder="Associate ID"
-                    sx={{ m: 2, width: "20ch" }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <KeyIcon />{" "}
-                        </InputAdornment>
-                      ),
-                    }}
-                    value={assocID}
-                    onChange={(e) => setAssocID(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <TextField
-                    label="Username"
-                    error={formSubmitted && username === ""}
-                    helperText={
-                      formSubmitted && username === ""
-                        ? "Username required"
-                        : ""
-                    }
-                    id="outlined-start-adornment"
-                    placeholder="Username"
-                    sx={{ m: 2, width: "25ch" }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <PermIdentityIcon />{" "}
-                        </InputAdornment>
-                      ),
-                    }}
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <TextField
-                    id="outlined-select-currency"
-                    select
-                    label="Employee Status"
-                    value={empStatus}
-                    onChange={(e) => setEmpStatus(e.target.value)}
-                    sx={{ m: 2, width: "25ch" }}
-                    InputProps={{
-                      startAdornment: (
-                        <PeopleOutlineIcon
-                          style={{ marginRight: "8px", color: "grey" }}
-                        />
-                      ),
-                    }}
-                  >
-                    <MenuItem key={0} value={"0"}>
-                      {"<Select status>"}
-                    </MenuItem>
-                    {statuses.map((status: any) => (
-                      <MenuItem
-                        key={status?.status_code}
-                        value={status?.status_code}
-                      >
-                        {status?.status_name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  {formSubmitted && empStatus === "0" && (
-                    <FormHelperText>Employee Status required</FormHelperText>
-                  )}
-                </FormControl>
-              </Box>
-            </div>
+  {/* Third row of text fields */}
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        label="Email"
+        id="outlined-start-adornment"
+        error={formSubmitted && email === ""}
+        helperText={
+          formSubmitted && email === "" ? "Email required" : ""
+        }
+        placeholder="Email"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <MailOutlineIcon />{" "}
+            </InputAdornment>
+          ),
+        }}
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+    </FormControl>
+  </Grid>
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        id="outlined-select-currency"
+        select
+        label="Position"
+        value={position}
+        onChange={(e) => setPosition(e.target.value as unknown as number)}
+        InputProps={{
+          startAdornment: (
+            <PeopleOutlineIcon
+              style={{ marginRight: "8px", color: "grey" }}
+            />
+          ),
+        }}
+      >
+        <MenuItem key={0} value={0}>
+          {"<Select a position>"}
+        </MenuItem>
+        {positions.map((pos: any) => (
+          <MenuItem key={pos?.position_id} value={pos?.position_id}>
+            {pos?.position_name}
+          </MenuItem>
+        ))}
+      </TextField>
+      {formSubmitted && position === 0 && (
+        <FormHelperText>Position required</FormHelperText>
+      )}
+    </FormControl>
+  </Grid>
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        id="outlined-select-currency" 
+        select
+        label="Role"
+        multiple
+        value={selectedRoles}
+        onChange={handleChange}
+        renderValue={(selected: any) => {
+          const selectedTitles: string[] = selectedRoles.map(
+            (roleId) => {
+              const matchingRole: any = roles.find(
+                (role: any) => role.role_id === roleId
+              );
+              return matchingRole ? matchingRole.title : "";
+            }
+          );
+          return selectedTitles.join(", ");
+        }}
+        MenuProps={MenuProps}
+        InputProps={{
+          startAdornment: (
+            <BusinessCenterIcon
+              style={{ marginRight: "8px", color: "grey" }}
+            />
+          ),
+        }}
+      >
+        {roles.map((role: any) => (
+          <MenuItem key={role.role_id} value={role.role_id}>
+            <Checkbox
+              checked={
+                selectedRoles.indexOf(role.role_id as never) >
+                -1
+              }
+            />
+            <ListItemText primary={role.title} />
+          </MenuItem>
+        ))}
+      </TextField>
+      {formSubmitted && selectedRoles.length === 0 && (
+        <FormHelperText>Role required</FormHelperText>
+      )}
+    </FormControl>
+  </Grid>
 
-            <div>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <FormControl>
-                  <TextField
-                    label="First Name"
-                    id="outlined-start-adornment"
-                    error={formSubmitted && firstName === ""}
-                    helperText={
-                      formSubmitted && firstName === ""
-                        ? "First Name required"
-                        : ""
-                    }
-                    placeholder="First Name"
-                    sx={{ m: 2, width: "25ch" }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <PermIdentityIcon />{" "}
-                        </InputAdornment>
-                      ),
-                    }}
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </FormControl>
-
-                <TextField
-                  label="Middle Name"
-                  id="outlined-start-adornment"
-                  placeholder="Middle Name"
-                  sx={{ m: 2, width: "25ch" }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PermIdentityIcon />{" "}
-                      </InputAdornment>
-                    ),
-                  }}
-                  value={middleName}
-                  onChange={(e) => setMiddleName(e.target.value)}
-                />
-                <FormControl>
-                  <TextField
-                    label="Last Name"
-                    error={formSubmitted && lastName === ""}
-                    helperText={
-                      formSubmitted && lastName === ""
-                        ? "Last Name required"
-                        : ""
-                    }
-                    id="outlined-start-adornment"
-                    placeholder="Last Name"
-                    sx={{ m: 2, width: "25ch" }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <PermIdentityIcon />{" "}
-                        </InputAdornment>
-                      ),
-                    }}
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </FormControl>
-              </Box>
-
-              {/* Start of Position and Role Form */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <FormControl>
-                  <TextField
-                    label="Email"
-                    id="outlined-start-adornment"
-                    error={formSubmitted && email === ""}
-                    helperText={
-                      formSubmitted && email === ""
-                        ? "Email required"
-                        : ""
-                    }
-                    placeholder="Email"
-                    sx={{ m: 2, width: "30ch" }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <MailOutlineIcon />{" "}
-                        </InputAdornment>
-                      ),
-                    }}
-                    value={email}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </FormControl>
-
-              </Box>
-
-            </div>
-            
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-
-              <FormControl>
-                <TextField
-                  id="outlined-select-currency"
-                  select
-                  label="Position"
-                  value={position}
-                  sx={{ m: 2, width: "30ch" }}
-                  onChange={(e) =>
-                    setPosition(e.target.value as unknown as number)
-                  }
-                  InputProps={{
-                    startAdornment: (
-                      <PeopleOutlineIcon
-                        style={{ marginRight: "8px", color: "grey" }}
-                      />
-                    ),
-                  }}
-                >
-                  <MenuItem key={0} value={0}>
-                            {"<Select a position>"}
-                          </MenuItem>
-                          {positions.map((pos: any) => (
-                            <MenuItem
-                              key={pos?.position_id}
-                              value={pos?.position_id}
-                            >
-                              {pos?.position_name}
-                            </MenuItem>
-                          ))}
-                </TextField>
-                {formSubmitted && position === 0 && (
-                          <FormHelperText>Position required</FormHelperText>
-                        )}
-              </FormControl>
-
-              <FormControl>
-                <TextField
-                  id="outlined-select-currency"
-                  select
-                  label="Role"
-                  multiple
-                  value={selectedRoles}
-                  onChange={handleChange}
-                  renderValue={(selected: any) => {
-                    const selectedTitles: string[] = selectedRoles.map(
-                      (roleId) => {
-                        const matchingRole: any = roles.find(
-                          (role: any) => role.role_id === roleId
-                        );
-                        return matchingRole ? matchingRole.title : "";
-                      }
-                    );
-                    return selectedTitles.join(", ");
-                  }}
-                  MenuProps={MenuProps}
-                  sx={{ m: 2, width: "30ch" }}
-                  InputProps={{
-                    startAdornment: (
-                      <BusinessCenterIcon
-                        style={{ marginRight: "8px", color: "grey" }}
-                      />
-                    ),
-                  }}
-                >
-                  {roles.map((role: any) => (
-                            <MenuItem key={role.role_id} value={role.role_id}>
-                              <Checkbox
-                                checked={
-                                  selectedRoles.indexOf(role.role_id as never) >
-                                  -1
-                                }
-                              />
-                              <ListItemText primary={role.title} />
-                            </MenuItem>
-                          ))}
-                </TextField>
-                {formSubmitted && selectedRoles.length === 0 && (
-                          <FormHelperText>Role required</FormHelperText>
-                        )}
-              </FormControl>
-
-              <FormControl>
-                <TextField
-                  id="outlined-select-currency"
-                  select
-                  label="Department"
-                  value={department}
-                  onChange={(e) =>
-                    setDepartment(e.target.value as unknown as number)
-                  }
-                  sx={{ m: 2, width: "30ch" }}
-                  InputProps={{
-                    startAdornment: (
-                      <PeopleOutlineIcon
-                        style={{ marginRight: "8px", color: "grey" }}
-                      />
-                    ),
-                  }}
-                >
-                 <MenuItem key={0} value={0}>
-                            {"<Select a department>"}
-                          </MenuItem>
-                          {sections.map((sect: any) => (
+  {/* Fourth row of text fields */}
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        id="outlined-select-currency"
+        select
+        label="Department"
+        value={department}
+        onChange={(e) => setDepartment(e.target.value as unknown as number)}
+        InputProps={{
+          startAdornment: (
+            <BusinessCenterIcon
+              style={{ marginRight: "8px", color: "grey" }}
+            />
+          ),
+        }}
+      >
+        <MenuItem key={0} value={0}>
+          {"<Select department>"}
+        </MenuItem>
+        {depts.map((dept: any) => (
+          <MenuItem key={dept?.dept_id} value={dept?.dept_id}>
+            {dept?.dept_name}
+          </MenuItem>
+        ))}
+      </TextField>
+      {formSubmitted && department === 0 && (
+        <FormHelperText>Department required</FormHelperText>
+      )}
+    </FormControl>
+  </Grid>
+  <Grid item xs={12} md={4}>
+    <FormControl fullWidth>
+      <TextField
+        id="outlined-select-currency"
+        select
+        label="Business Unit"
+        value={businessUnit}
+        onChange={(e) => setBusinessUnit(e.target.value as unknown as number)}
+        InputProps={{
+          startAdornment: (
+            <BusinessCenterIcon
+              style={{ marginRight: "8px", color: "grey" }}
+            />
+          ),
+        }}
+      >
+        <MenuItem key={0} value={0}>
+          {"<Select business unit>"}
+        </MenuItem>
+        {sections.map((sect: any) => (
                             <MenuItem
                               key={sect?.section_id}
                               value={sect?.section_id}
                             >
                               {sect?.section_name}
-                            </MenuItem>
-                          ))}
-                </TextField>
-                {formSubmitted && department === 0 && (
-                          <FormHelperText>Department required</FormHelperText>
-                        )}
-              </FormControl>
-
-              <FormControl>
-                <TextField
-                  id="outlined-select-currency"
-                  select
-                  label="Business Unit"
-                 value={businessUnit}
-                          onChange={(e) =>
-                            setBusinessUnit(e.target.value as unknown as number)
-                          }
-                  sx={{ m: 2, width: "30ch" }}
-                  InputProps={{
-                    startAdornment: (
-                      <PeopleOutlineIcon
-                        style={{ marginRight: "8px", color: "grey" }}
-                      />
-                    ),
-                  }}
-                >
-                  <MenuItem key={0} value={0}>
-                            {"<Select a business unit>"}
-                          </MenuItem>
-                          {depts.map((dept: any) => (
-                            <MenuItem key={dept?.dept_id} value={dept?.dept_id}>
-                              {dept?.dept_name}
-                            </MenuItem>
-                          ))}
-                </TextField>
-                {formSubmitted && businessUnit === 0 && (
-                          <FormHelperText>Business Unit required</FormHelperText>
-                        )}
-              </FormControl>
-            </Box>
-          </Paper>
-        </Box>
+          </MenuItem>
+        ))}
+      </TextField>
+      {formSubmitted && businessUnit === 0 && (
+        <FormHelperText>Business Unit required</FormHelperText>
+      )}
+    </FormControl>
+  </Grid>
+</Grid>
+    
+       </Paper>
+      </Box>
       </ThemeProvider>
     </>
   );

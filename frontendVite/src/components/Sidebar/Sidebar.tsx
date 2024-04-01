@@ -26,7 +26,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { logout } from "../../redux/saga/sessionSaga"; // Import the logout action
 import { useDispatch } from "react-redux";
 import "./sidebar.css"; // Import styles object from CSS module
-import logoWhite from "./../../assets/logoWhite.png";
+import logoWhite from "./../../assets/logo.png";
 import UserProfile from "../dashboard/UserProfile";
 import { Button, Modal } from "@mui/material";
 
@@ -172,7 +172,8 @@ export default function Sidebar() {
             src={logoWhite}
             alt=""
             style={{
-              height: 70,
+              opacity: 0.8,
+              height: 65,
               width: 290,
             }}
           />
@@ -241,7 +242,7 @@ export default function Sidebar() {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Users", "Starred", "Send email", "Drafts"].map((text, index) => (
+          {["Users", "Dashboard", "Send email", "Drafts"].map((text, index) => (
             <ListItem key={text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{

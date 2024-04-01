@@ -35,7 +35,7 @@ import { LockOutlinedIcon } from "@mui/icons-material/LockOutlined";
 import ViewColumnIcon from "@material-ui/icons/ViewColumn";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { Button, Fab, Link } from "@mui/material";
+import { Button, Fab, Grid, Link } from "@mui/material";
 import * as XLSX from "xlsx"; // Import XLSX library
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import excelLogo from "./../../assets/excel.png";
@@ -416,40 +416,42 @@ export default function UserTable() {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Paper
-        sx={{ width: "100%", mb: 2, marginTop: 8, background: "#FAF9F6" }}
-        elevation={20}
+  <Paper
+    sx={{ width: "100%", mb: 2, marginTop: 8, background: "#FAF9F6" }}
+    elevation={20}
+  >
+    <Toolbar
+      sx={{
+        pl: { sm: 2 },
+        pr: { xs: 1, sm: 1 },
+      }}
+    >
+      <Typography
+        sx={{ flex: "1 1 100%" }}
+        variant="h6"
+        id="tableTitle"
+        component="div"
       >
-        <Toolbar
-          sx={{
-            pl: { sm: 2 },
-            pr: { xs: 1, sm: 1 },
-          }}
-        >
-          <Typography
-            sx={{ flex: "1 1 100%" }}
-            variant="h6"
-            id="tableTitle"
-            component="div"
-          >
-            Users
-          </Typography>
+        Users
+      </Typography>
+      <Grid container alignItems="center" justifyContent="flex-end" spacing={1}>
+        <Grid item xs={12} sm={6} md={4}>
           <InputBase
             color="primary"
-            sx={{ borderBottom: "1px solid black", width: "60vh" }}
+            sx={{ borderBottom: "1px solid black", width: "100%" }}
             placeholder="Search…"
             onChange={handleRequestFilter}
             inputProps={{ "aria-label": "search" }}
           />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
           <Select
-            sx={{ paddingLeft: "40px" }}
             multiple
             value={visibleColumns}
             onChange={handleColumnVisibilityChange}
             input={<InputBase />}
             renderValue={(selected) => (
               <IconButton
-                sx={{ paddingRight: "40px" }}
                 size="small"
                 aria-label="View Columns"
                 onClick={(event) => {
@@ -460,7 +462,6 @@ export default function UserTable() {
                 Column
               </IconButton>
             )}
-            style={{ marginLeft: "10px" }}
           >
             {headCells.map((headCell) => (
               <MenuItem key={headCell.id} value={headCell.id}>
@@ -469,15 +470,18 @@ export default function UserTable() {
               </MenuItem>
             ))}
           </Select>
+        </Grid>
+        <Grid item>
           <Button
-            sx={{ paddingRight: "40px" }}
             color="success"
             onClick={handleExportExcel} // Change the handler to handleExportExcel
           >
             <FileDownloadIcon /> Export
             <img src={excelLogo} alt="" style={{ width: "0px" }} />
           </Button>
-        </Toolbar>
+        </Grid>
+      </Grid>
+    </Toolbar>
 
         <TableContainer id="table-container">
           <Table
@@ -540,64 +544,61 @@ export default function UserTable() {
         </TableContainer>
 
         <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        p: 1,
+        m: 1,
+        bgcolor: "#FAF9F6",
+        borderRadius: 1,
+      }}
+    >
+      <Box sx={{ paddingLeft: "10px" }}>
+        <Fab
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            p: 1,
-            m: 1,
-            bgcolor: "#FAF9F6",
-            borderRadius: 1,
+            background: "#ff6f33",
+            color: "white",
+            "&:hover": {
+              background: "#d24e01", // Change the background color on hover
+            },
+            position: "relative",
+            "&:hover::before": {
+              content: '"Add User"',
+              position: "absolute",
+              top: "-50px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              backgroundColor: "#000",
+              color: "#fff",
+              padding: "5px",
+              borderRadius: "5px",
+              fontSize: "11px",
+              opacity: 0.6,
+            },
           }}
+          aria-label="add"
+          size="small"
         >
-          <Box sx={{ paddingLeft: "10px" }}>
-            {/* <Button sx={{ marginRight: "8px", color: "#d24e01" }}>
-              <PersonAddIcon sx={{ marginRight: 1, height: "2vh"}}/> Add User
-            </Button> */}
-            <Fab
-              sx={{
-                background: "#ff6f33",
-                color: "white",
-                "&:hover": {
-                  background: "#d24e01", // Change the background color on hover
-                },
-                position: "relative",
-                "&:hover::before": {
-                  content: '"Add User"',
-                  position: "absolute",
-                  top: "-50px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  backgroundColor: "#000",
-                  color: "#fff",
-                  padding: "5px",
-                  borderRadius: "5px",
-                  fontSize: "11px",
-                  opacity: 0.6,
-                },
-              }}
-              aria-label="add"
-              size="small"
-            >
-              <AddIcon />
-            </Fab>
-          </Box>
-          <Box>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={filteredRows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Box>
-        </Box>
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
+          <AddIcon />
+        </Fab>
+      </Box>
+      <Box>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={filteredRows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Box>
     </Box>
+  </Paper>
+  <FormControlLabel
+    control={<Switch checked={dense} onChange={handleChangeDense} />}
+    label="Dense padding"
+  />
+</Box>
   );
 }
