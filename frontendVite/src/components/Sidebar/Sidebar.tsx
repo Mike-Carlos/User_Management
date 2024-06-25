@@ -26,7 +26,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { logout } from "../../redux/saga/sessionSaga"; // Import the logout action
 import { useDispatch } from "react-redux";
 import "./sidebar.css"; // Import styles object from CSS module
-import logoWhite from "./../../assets/logo.png";
+import logoWhite from "./../../assets/logoWhite.png";
 import UserProfile from "../dashboard/UserProfile";
 import { Button, Modal } from "@mui/material";
 
